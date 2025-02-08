@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Delayed YouTube</title>
+    <script src="./tools.js" defer></script>
+    <script src="./script.js" defer></script>
+    <link rel="stylesheet" href="./output.css" />
+    <link rel="icon" type="image/png" href="./isha-logo.png" />
+  </head>
+  <body class="scrollbar-none">
+    <div class="width-full relative m-auto overflow-hidden pb-[56.25%]">
+      <iframe
+        id="player"
+        class="absolute h-full w-full"
+        width="560"
+        height="315"
+        src=""
+        title="YouTube video player"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen></iframe>
+    </div>
+
+    <div id="delay-info" class="fixed right-2 top-2 z-50 hidden rounded px-4 py-2 text-sm opacity-30 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
+      ...
+    </div>
+
+    <div id="controls" class="mx-auto mt-5 w-fit">
+      <span class="mx-1">||</span>
+      <strong>Duration:</strong> <span id="duration-stat">...</span>
+      <span class="mx-1">||</span>
+      <strong>Delay:</strong> <span id="delay-stat">...</span>
+      <span class="mx-1">||</span>
+      New Delay
+      <input type="number" class="input input-xs input-bordered w-14 text-secondary" placeholder="Delay" value="900" min="0" id="new-delay" />
+      <button class="btn btn-outline btn-secondary btn-xs" onclick="updateDelay()">Update</button>
+      <span class="mx-1">||</span>
+      <button class="btn btn-outline btn-secondary btn-xs" onclick="adjustDelay(60)">-60s</button>
+      <button class="btn btn-outline btn-secondary btn-xs" onclick="adjustDelay(30)">-30s</button>
+      <button class="btn btn-outline btn-secondary btn-xs" onclick="adjustDelay(10)">-10s</button>
+      <button class="btn btn-secondary btn-xs" onclick="adjustDelay(-10)">+10s</button>
+      <button class="btn btn-secondary btn-xs" onclick="adjustDelay(-30)">+30s</button>
+      <button class="btn btn-secondary btn-xs" onclick="adjustDelay(-60)">+60s</button>
+      <span class="mx-1">||</span>
+    </div>
+
+    <div class="navbar mb-2 mt-10 bg-base-100">
+      <div class="flex-1">
+        <a class="btn btn-ghost text-xl" href="/">YAD: YouTube Auto Delay</a>
+      </div>
+      <div class="flex-none">
+        <ul class="menu menu-horizontal px-1">
+          <li><a href="/delayed-yt/controls.html" target="_blank">Controls</a></li>
+          <li><a href="#docs">Docs</a></li>
+          <li><a href="https://github.com/isha-live/delayed-yt/" target="_blank">GitHub</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="prose mx-auto">
+      <p>
+        This website addresses the
+        <strong>skipping issue</strong> in YouTube for delayed streams.<br /><br />
+
+        <strong>What is the skip issue?</strong> If you are currently watching a stream that is 15min behind LIVE and you face some network
+        fluctuations, YouTube may jump to LIVE (i.e. 0sec delay) and those 15min will be lost.<br /><br />
+
+        But if you are using YAD and YouTube tries to jump to LIVE, <b>the script will automatically bring you back</b>, so you will not miss
+        anything!<br /><br />
+
+        <strong>Note 1:</strong> Due to YouTube limitations, the script only works for streams that started at least 30min ago. For newly started
+        streams, the script will not correct the skipping.<br /><br />
+
+        <strong>Note 2:</strong> You can't go to LIVE because the minimum delay is set to 600s (10min). If you click the <b>LIVE</b> button, the
+        script will think that YouTube skipped and will take you back.<br /><br />
+      </p>
+    </div>
+
+    <div class="mx-auto my-5 w-[400px]">
+      <div class="flex items-center justify-between border-b p-4">
+        YouTube Video ID
+        <input
+          type="text"
+          placeholder="Enter Video ID"
+          class="input input-bordered float-right w-52 text-secondary"
+          value="jfKfPfyJRdk"
+          id="videoId" />
+      </div>
+
+      <div class="flex items-center justify-between border-b p-4">
+        Starting Delay (sec)
+        <label class="ml-4 inline-flex cursor-pointer items-center">
+          <input
+            type="number"
+            class="input input-bordered float-right w-52 text-secondary"
+            placeholder="Enter Delay"
+            value="900"
+            min="600"
+            id="delay" />
+        </label>
+      </div>
+
+      <div class="flex items-center justify-between p-4">
+        Enhanced Privacy Player
+        <label class="ml-4 inline-flex cursor-pointer items-center">
+          <input type="checkbox" class="checkbox-secondary checkbox float-right" id="privacy" />
+        </label>
+      </div>
+      <button class="btn btn-outline btn-secondary btn-sm my-2" onclick="loadNewVideo()">Update</button>
+    </div>
+
+    <footer class="footer footer-center mt-10 bg-base-300 p-4 text-base-content">
+      <aside>
+        <p>Copyright © 2024 - All right reserved by LSM</p>
+      </aside>
+    </footer>
+  </body>
+</html>
