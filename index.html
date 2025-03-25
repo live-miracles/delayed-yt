@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="night">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -23,7 +23,7 @@
         allowfullscreen></iframe>
     </div>
 
-    <div id="delay-info" class="fixed right-2 top-2 z-50 hidden rounded px-4 py-2 text-sm opacity-30 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
+    <div id="delay-info" class="fixed top-2 right-2 z-50 hidden rounded px-4 py-2 text-sm opacity-30 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
       ...
     </div>
 
@@ -34,7 +34,7 @@
       <strong>Delay:</strong> <span id="delay-stat">...</span>
       <span class="mx-1">||</span>
       New Delay
-      <input type="number" class="input input-xs input-bordered w-14 text-secondary" placeholder="Delay" value="900" min="0" id="new-delay" />
+      <input type="number" class="input input-xs text-secondary w-14" placeholder="Delay" value="900" min="0" id="new-delay" />
       <button class="btn btn-outline btn-secondary btn-xs" onclick="updateDelay()">Update</button>
       <span class="mx-1">||</span>
       <button class="btn btn-outline btn-secondary btn-xs" onclick="adjustDelay(60)">-60s</button>
@@ -46,7 +46,29 @@
       <span class="mx-1">||</span>
     </div>
 
-    <div class="navbar mb-2 mt-10 bg-base-100">
+    <div class="mx-auto my-5 w-[400px]">
+      <div class="flex items-center justify-between p-1">
+        YouTube Video ID
+        <input type="text" placeholder="Enter Video ID" class="input text-secondary float-right w-52" value="jfKfPfyJRdk" id="videoId" />
+      </div>
+
+      <div class="flex items-center justify-between p-1">
+        Starting Delay (sec)
+        <label class="ml-4 inline-flex cursor-pointer items-center">
+          <input type="number" class="input text-secondary float-right w-52" placeholder="Enter Delay" value="900" min="600" id="delay" />
+        </label>
+      </div>
+
+      <div class="flex items-center justify-between p-1">
+        Enhanced Privacy Player
+        <label class="ml-4 inline-flex cursor-pointer items-center">
+          <input type="checkbox" class="checkbox-secondary checkbox float-right" id="privacy" />
+        </label>
+      </div>
+      <button class="btn btn-outline btn-secondary my-2" onclick="loadNewVideo()">Update</button>
+    </div>
+
+    <div class="navbar bg-base-100 mt-10 mb-2">
       <div class="flex-1">
         <a class="btn btn-ghost text-xl" href="/">Delayed YouTube</a>
       </div>
@@ -78,40 +100,7 @@
       </p>
     </div>
 
-    <div class="mx-auto my-5 w-[400px]">
-      <div class="flex items-center justify-between border-b p-4">
-        YouTube Video ID
-        <input
-          type="text"
-          placeholder="Enter Video ID"
-          class="input input-bordered float-right w-52 text-secondary"
-          value="jfKfPfyJRdk"
-          id="videoId" />
-      </div>
-
-      <div class="flex items-center justify-between border-b p-4">
-        Starting Delay (sec)
-        <label class="ml-4 inline-flex cursor-pointer items-center">
-          <input
-            type="number"
-            class="input input-bordered float-right w-52 text-secondary"
-            placeholder="Enter Delay"
-            value="900"
-            min="600"
-            id="delay" />
-        </label>
-      </div>
-
-      <div class="flex items-center justify-between p-4">
-        Enhanced Privacy Player
-        <label class="ml-4 inline-flex cursor-pointer items-center">
-          <input type="checkbox" class="checkbox-secondary checkbox float-right" id="privacy" />
-        </label>
-      </div>
-      <button class="btn btn-outline btn-secondary btn-sm my-2" onclick="loadNewVideo()">Update</button>
-    </div>
-
-    <footer class="footer footer-center mt-10 bg-base-300 p-4 text-base-content">
+    <footer class="footer footer-center bg-base-300 text-base-content mt-10 p-4">
       <aside>
         <p>
           For any bug / feature requests, please open an issue in our

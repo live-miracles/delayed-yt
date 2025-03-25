@@ -1,9 +1,11 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@plugin "@tailwindcss/typography";
+@plugin "daisyui" {
+    themes: night;
+}
 
 .card-container {
-    @apply card static mx-2 my-5 inline-block min-h-44 w-[500px] bg-base-200 shadow-xl;
+    @apply card bg-base-200 static mx-2 my-5 inline-block min-h-44 w-[500px] shadow-xl;
 }
 
 .scrollbar-none::-webkit-scrollbar {
