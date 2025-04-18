@@ -23,9 +23,12 @@ function extractYouTubeId(str) {
     }
 }
 
-function getUrlParam(name) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(name);
+function durationToString(duration) {
+    const dur = parseInt(duration);
+    const h = Math.floor(dur / 3600);
+    const m = Math.floor((dur % 3600) / 60);
+    const s = Math.floor(dur % 60);
+    return `${h > 0 ? h + 'h:' : ''}${h > 0 || m > 0 ? m + 'm:' : ''}${s}s`;
 }
 
 // ===== Document Config & URL Utils =====
@@ -39,7 +42,7 @@ function setInputValue(id, value) {
     if (input.type === 'checkbox') {
         console.assert(['0', '1'].includes(value));
         input.checked = value === '1';
-    } else if (input.type === 'text' || input.type === 'number') {
+    } else if (input.type === 'text' || input.type === 'number' || input.type === 'url') {
         input.value = value;
     } else {
         console.error('Unknown input type: ' + input.type);
@@ -68,7 +71,7 @@ function parseDocumentConfig() {
     document.querySelectorAll('.url-param').forEach((input) => {
         if (input.type === 'checkbox') {
             params.append('__' + input.id, input.checked ? '1' : '0');
-        } else if (input.type === 'text' || input.type === 'number') {
+        } else if (input.type === 'text' || input.type === 'number' || input.type === 'url') {
             params.append('__' + input.id, String(input.value));
         } else {
             console.error('unexpected type: ' + input.type);
@@ -79,5 +82,5 @@ function parseDocumentConfig() {
 
 function updateUrlParams() {
     const configParams = parseDocumentConfig();
-    window.history.pushState({}, '', `?$${configParams.toString()}`);
+    window.history.pushState({}, '', `?${configParams.toString()}`);
 }

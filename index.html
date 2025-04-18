@@ -59,19 +59,26 @@
 
         <label class="input ml-2 w-fit">
           <input required type="number" class="url-param text-secondary w-9" placeholder="hh" value="0" min="0" id="delay-hour" />
-          h
+          h:
           <input required type="number" class="url-param text-secondary w-9" placeholder="mm" value="15" min="0" id="delay-min" />
-          m
+          m:
           <input required type="number" class="url-param text-secondary w-9" placeholder="ss" value="0" min="0" id="delay-sec" />
           s
         </label>
       </div>
 
       <div class="my-2 w-fit">
-        Status server (optional)
+        Status Server (optional)
 
         <label class="input ml-2 w-[330px]">
-          <input placeholder="https://" value="http://" class="url-param text-secondary" id="status-server" name="status-server" list="servers" />
+          <input
+            type="url"
+            placeholder="https://"
+            value="http://"
+            class="url-param text-secondary"
+            id="status-server"
+            name="status-server"
+            list="servers" />
           <datalist id="servers">
             <option value="http://192.168.154.119/delayed-yt/api/status"></option>
           </datalist>
@@ -79,7 +86,7 @@
       </div>
 
       <div class="my-2 w-fit">
-        Status title (optional)
+        Status Title (optional)
         <label class="input ml-2 w-72">
           <input placeholder="Enter status title" value="" class="url-param text-secondary" id="status-title" name="status-title" />
         </label>
@@ -95,8 +102,9 @@
       <div class="flex-none">
         <ul class="menu menu-horizontal px-1">
           <li><a href="/">Home</a></li>
-          <li><a href="/delayed-yt/controls.html" target="_blank">Controls</a></li>
-          <li><a href="https://github.com/live-miracles/delayed-yt/" target="_blank">GitHub</a></li>
+          <li><a href="/delayed-yt/controls.html">Controls</a></li>
+          <li><a href="/delayed-yt/stats.html">Stats</a></li>
+          <li><a href="https://github.com/live-miracles/delayed-yt/">GitHub</a></li>
         </ul>
       </div>
     </div>
@@ -126,7 +134,7 @@
       <aside>
         <p>
           For any bug / feature requests, please open an issue in our
-          <a class="link" href="https://github.com/live-miracles/delayed-yt/" target="_blank">GitHub</a> repo (ʃƪ˶˘ ﻬ ˘˶).
+          <a class="link" href="https://github.com/live-miracles/delayed-yt/">GitHub</a> repo (ʃƪ˶˘ ﻬ ˘˶).
         </p>
         <p>Check out our <a class="link" href="/">homepage</a> for more streaming tools (=ↀωↀ=).</p>
       </aside>

@@ -34,16 +34,8 @@ function renderStats(duration, delay) {
         return;
     }
 
-    const dur = duration | 0;
-    const durationHours = (dur / 3600) | 0;
-    const durationMinutes = ((dur / 60) | 0) % 60;
-    const durationSeconds = dur % 60;
-    durationElem.innerHTML = `${durationHours}h:${durationMinutes}m:${durationSeconds}s`;
-
-    const del = delay | 0;
-    const delayMinutes = (del / 60) | 0;
-    const delaySeconds = del % 60;
-    delayElem.innerHTML = `${delayMinutes}m:${delaySeconds}s (${del} s)`;
+    durationElem.innerHTML = durationToString(duration);
+    delayElem.innerHTML = durationToString(delay);
 }
 
 function changeConnection() {

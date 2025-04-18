@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en" data-theme="night">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stats: Delayed YouTube</title>
+    <script src="./tools.js" defer></script>
+    <script src="./stats.js" defer></script>
+    <link rel="stylesheet" href="./output.css" />
+    <link rel="icon" type="image/png" href="./logo.png" />
+  </head>
+  <body class="flex min-h-screen flex-col">
+    <div class="navbar bg-base-100">
+      <div class="flex-1">
+        <a class="btn btn-ghost text-xl" href="/">Delayed YouTube</a>
+      </div>
+      <div class="flex-none">
+        <ul class="menu menu-horizontal px-1">
+          <li><a href="/">Home</a></li>
+          <li><a href="/delayed-yt/controls.html">Controls</a></li>
+          <li><a href="/delayed-yt/stats.html">Stats</a></li>
+          <li><a href="https://github.com/live-miracles/delayed-yt/">GitHub</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="m-auto w-fit px-1 text-center">
+      <div class="my-2 w-fit">
+        Stats Server URL
+
+        <label class="input ml-2 w-[330px]">
+          <input
+            type="url"
+            placeholder="https://"
+            value="http://"
+            class="url-param text-secondary"
+            id="stats-server"
+            name="stats-server"
+            list="servers" />
+          <datalist id="servers">
+            <option value="http://192.168.154.119/delayed-yt/api/stats"></option>
+          </datalist>
+        </label>
+      </div>
+    </div>
+
+    <div class="flex flex-1 flex-col items-center">
+      <div class="flex w-full flex-wrap" id="boxes"></div>
+    </div>
+
+    <footer class="footer footer-center bg-base-300 text-base-content mt-10 p-4">
+      <aside>
+        <p>
+          For any bug / feature requests, please open an issue in our
+          <a class="link" href="https://github.com/live-miracles/delayed-yt/">GitHub</a> repo (ʃƪ˶˘ ﻬ ˘˶).
+        </p>
+        <p>Check out our <a class="link" href="/">homepage</a> for more streaming tools (=ↀωↀ=).</p>
+      </aside>
+    </footer>
+  </body>
+</html>
