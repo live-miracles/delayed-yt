@@ -46,25 +46,45 @@
       <span class="mx-1">||</span>
     </div>
 
-    <div class="mx-auto my-5 w-[400px]">
-      <div class="flex items-center justify-between p-1">
+    <div class="m-auto mt-10 w-fit px-1 text-center">
+      <div class="my-2 w-fit">
         YouTube Video ID
-        <input type="text" placeholder="Enter Video ID" class="input text-secondary float-right w-52" value="jfKfPfyJRdk" id="videoId" />
-      </div>
-
-      <div class="flex items-center justify-between p-1">
-        Starting Delay (sec)
-        <label class="ml-4 inline-flex cursor-pointer items-center">
-          <input type="number" class="input text-secondary float-right w-52" placeholder="Enter Delay" value="900" min="600" id="delay" />
+        <label class="input ml-2 w-32">
+          <input required type="text" placeholder="Enter Video ID" class="url-param text-secondary" value="jfKfPfyJRdk" id="video-id" />
         </label>
       </div>
 
-      <div class="flex items-center justify-between p-1">
-        Enhanced Privacy Player
-        <label class="ml-4 inline-flex cursor-pointer items-center">
-          <input type="checkbox" class="checkbox-secondary checkbox float-right" id="privacy" />
+      <div class="my-2 w-fit">
+        Starting Delay (minimum 10min)
+
+        <label class="input ml-2 w-fit">
+          <input required type="number" class="url-param text-secondary w-9" placeholder="hh" value="0" min="0" id="delay-hour" />
+          h
+          <input required type="number" class="url-param text-secondary w-9" placeholder="mm" value="15" min="0" id="delay-min" />
+          m
+          <input required type="number" class="url-param text-secondary w-9" placeholder="ss" value="0" min="0" id="delay-sec" />
+          s
         </label>
       </div>
+
+      <div class="my-2 w-fit">
+        Status server (optional)
+
+        <label class="input ml-2 w-[330px]">
+          <input placeholder="https://" value="http://" class="url-param text-secondary" id="status-server" name="status-server" list="servers" />
+          <datalist id="servers">
+            <option value="http://192.168.154.119/delayed-yt/api/status"></option>
+          </datalist>
+        </label>
+      </div>
+
+      <div class="my-2 w-fit">
+        Status title (optional)
+        <label class="input ml-2 w-72">
+          <input placeholder="Enter status title" value="" class="url-param text-secondary" id="status-title" name="status-title" />
+        </label>
+      </div>
+
       <button class="btn btn-outline btn-secondary my-2" onclick="loadNewVideo()">Update</button>
     </div>
 
@@ -95,8 +115,10 @@
         <strong>Note 1:</strong> Due to YouTube limitations, the script only works for streams that started at least 30min ago. For newly started
         streams, the script will not correct the skipping.<br /><br />
 
-        <strong>Note 2:</strong> You can't go to LIVE because the minimum delay is set to 600s (10min). If you click the <b>LIVE</b> button, the
-        script will think that YouTube skipped and will take you back.<br /><br />
+        <strong>Note 2:</strong> You can't go to LIVE because the minimum delay is set to 10min. If you click the <b>LIVE</b> button, the script will
+        think that YouTube skipped and will take you back.<br /><br />
+
+        <strong>Note 3:</strong> You can set up a status server to monitor the current delay remotely. <br /><br />
       </p>
     </div>
 

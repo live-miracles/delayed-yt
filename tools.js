@@ -28,13 +28,56 @@ function getUrlParam(name) {
     return urlParams.get(name);
 }
 
-function setInputsFromUrlParams() {
-    const videoIdParam = getUrlParam(VIDEO_ID_PARAM) || DEFAULT_VIDEO_ID;
-    document.getElementById('videoId').value = videoIdParam;
+// ===== Document Config & URL Utils =====
+function setInputValue(id, value) {
+    const input = document.getElementById(id, value);
+    console.assert(input !== null, 'Can\'t find element with ID "' + id + '"');
+    if (input === null) {
+        return;
+    }
 
-    const delayParam = getUrlParam(DELAY_PARAM) || DEFAULT_DELAY;
-    document.getElementById('delay').value = delayParam;
+    if (input.type === 'checkbox') {
+        console.assert(['0', '1'].includes(value));
+        input.checked = value === '1';
+    } else if (input.type === 'text' || input.type === 'number') {
+        input.value = value;
+    } else {
+        console.error('Unknown input type: ' + input.type);
+    }
+}
 
-    const privacyParam = getUrlParam(PRIVACY_PARAM) || DEFAULT_PRIVACY;
-    document.getElementById('privacy').checked = privacyParam === '1';
+function getConfigUrlParams() {
+    const url = window.location.href;
+    const searchParams = new URLSearchParams(new URL(url).search);
+    const params = [];
+    searchParams.forEach(function (value, key) {
+        if (key === '' || !key.startsWith('__')) return;
+        params.push({ key: key.substring(2), value: value });
+    });
+    return params;
+}
+
+function setInputElements() {
+    const urlParams = getConfigUrlParams();
+    urlParams.forEach((param) => setInputValue(param.key, param.value));
+}
+
+function parseDocumentConfig() {
+    const params = new URLSearchParams();
+
+    document.querySelectorAll('.url-param').forEach((input) => {
+        if (input.type === 'checkbox') {
+            params.append('__' + input.id, input.checked ? '1' : '0');
+        } else if (input.type === 'text' || input.type === 'number') {
+            params.append('__' + input.id, String(input.value));
+        } else {
+            console.error('unexpected type: ' + input.type);
+        }
+    });
+    return params;
+}
+
+function updateUrlParams() {
+    const configParams = parseDocumentConfig();
+    window.history.pushState({}, '', `?$${configParams.toString()}`);
 }
