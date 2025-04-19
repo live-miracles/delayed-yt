@@ -25,16 +25,26 @@ async function fetchStats() {
 }
 
 function getBoxHtml(status) {
-    let small = `${status.title} (${status.id})`;
-    let big = durationToString(status.delay);
+    let p1 = status.title;
+    let p2 = `${status.id} <span class="text-secondary">|</span> ${status.ip}`;
+    let p3 = durationToString(status.delay);
+    let p4 = durationToString(status.duration);
+
     if (status.error) {
-        small = status.error;
-        big = 'Error';
+        p1 = status.error;
+        p2 = '';
+        p3 = 'Error';
+        p4 = '';
     }
     return `
-        <div class="w-[500px] h-[200px] text-center bg-neutral rounded-lg shadow-md m-2 p-2">
-            <h3 class="text-3xl">${small}</h3>
-            <p class="text-9xl ${status.error ? 'text-error' : ''}">${big}</p>
+        <div class="w-fit min-w-[450px] max-w-[700px] h-fit text-center bg-neutral rounded-lg shadow-md m-2 p-3">
+            <p class="text-3xl">${p2}</p>
+            <p>
+                <span class="text-7xl ${status.error ? 'text-error' : ''}">${p3}</span>
+                <span class="text-3xl ml-3">${p4}</span>
+            </p>
+            <p class="font-semibold text-3xl text-secondary my-1">${p1}</p>
+
         </div>`;
 }
 

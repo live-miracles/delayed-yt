@@ -184,14 +184,15 @@ function sendStatusUpdate() {
     }
     const id = player.videoId;
     const title = player.statusTitle;
-    const delay = player.savedDelay;
+    const delay = Math.floor(player.savedDelay);
+    const duration = Math.floor(getActualDuration());
 
     fetch(statusServer, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id, title, delay }),
+        body: JSON.stringify({ id, title, delay, duration }),
     })
         .then((response) => {
             if (!response.ok) {

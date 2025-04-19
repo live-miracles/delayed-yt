@@ -11,9 +11,10 @@ function removeStatusById(id) {
 }
 
 router.post('/status', (req, res) => {
-    const { id, title, delay } = req.body;
+    const { id, title, delay, duration } = req.body;
+    const ip = req.ip.replace('::ffff:', '');
 
-    if (!id || !title || typeof delay !== 'number') {
+    if (!id || !title || typeof delay !== 'number' || typeof duration !== 'number') {
         return res.status(400).json({ error: 'Missing or invalid fields' });
     }
 
@@ -22,7 +23,7 @@ router.post('/status', (req, res) => {
     }
     const timer = setTimeout(() => removeStatusById(id), 10000);
 
-    statusMap.set(id, { id, title, delay, timer });
+    statusMap.set(id, { id, title, delay, duration, ip, timer });
 
     res.status(200).json({ message: 'Status saved' });
 });
