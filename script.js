@@ -180,7 +180,7 @@ function adjustDelay(val) {
         } else if (currentDelay > SKIP_MARGIN) {
             // If curent delay is betwen SKIP_MARGIN and MINIMAL_DELAY just set
             // savedDelay to MINIMAL_DELAY and continute
-            if (player.savedDelay != MINIMAL_DELAY) {
+            if (player.savedDelay === MINIMAL_DELAY) {
                 return;
             }
             player.savedDelay = MINIMAL_DELAY;
