@@ -1,13 +1,12 @@
 const YT_BASE_URL = 'https://www.youtube.com/embed/';
 
-const SKIP_MARGIN = 600;
+const MINIMAL_DELAY = 600;
+const SKIP_MARGIN = 500;
 const START_MARGIN = 30;
 const SKIP_CORRECTION = 5;
 const STREAM_DURATION_CORRECTION = 3600;
 
 const DEFAULT_VIDEO_ID = 'jfKfPfyJRdk';
-const DEFAULT_DELAY = 900;
-const MINIMAL_DELAY = 660;
 
 const player = {
     ytPlayer: null,
@@ -16,35 +15,9 @@ const player = {
     startingDate: -100,
     videoId: '',
     statusTitle: '',
-    connection: null,
     startingDelay: -100,
     savedDelay: -100,
 };
-
-function getVideoId() {
-    return document.getElementById('video-id').value;
-}
-
-function getStatusTitle() {
-    return document.getElementById('status-title').value;
-}
-
-function getStatusServer() {
-    return document.getElementById('status-server').value;
-}
-
-function getDelay() {
-    const delayH = parseInt(document.getElementById('delay-hour').value);
-    const delayM = parseInt(document.getElementById('delay-min').value);
-    const delayS = parseInt(document.getElementById('delay-sec').value);
-    const delay = delayH * 3600 + delayM * 60 + delayS;
-    console.assert(delay >= MINIMAL_DELAY);
-    if (delay < MINIMAL_DELAY) {
-        console.error(`Delay shouldn't be less than ${MINIMAL_DELAY}s`);
-        return MINIMAL_DELAY;
-    }
-    return delay;
-}
 
 function updatePlayerData() {
     player.videoId = getVideoId();
@@ -63,9 +36,6 @@ function loadPlayer() {
 
 async function loadNewVideo() {
     updatePlayerData();
-    if (player.connection) player.connection.close();
-    player.connection = getNewBroadcastChannel();
-
     await player.ytPlayer.loadVideoById({ videoId: player.videoId });
 }
 
@@ -100,7 +70,7 @@ function onPlayerStateChange(event) {
     }
 }
 
-function getActualDuration() {
+function getActualDuration(player) {
     if (player.startingDuration <= 0) {
         console.error('Invalid duration:', player.startingDuration);
         return 0;
@@ -124,90 +94,22 @@ function seekDelay(delay) {
         return;
     }
     console.assert(delay >= MINIMAL_DELAY);
-    const newTime = getActualDuration() - delay;
+    const newTime = getActualDuration(player) - delay;
     console.log('Seeking to a new delay: ' + delay + ', at time:' + newTime);
     player.ytPlayer.seekTo(newTime);
     player.isReady = false;
 }
 
 function updateDelay() {
-    const newDelayElem = document.getElementById('new-delay');
-    let newDelay = parseInt(newDelayElem.value);
-    console.log(newDelay);
-    if (newDelay < MINIMAL_DELAY) newDelay = MINIMAL_DELAY;
-    seekDelay(newDelay);
+    const newDelay = getNewDelay();
+    seekDelay(newDelay < MINIMAL_DELAY ? MINIMAL_DELAY : newDelay);
 }
 
 function adjustDelay(val) {
-    const currentDelay = getActualDuration() - player.ytPlayer.getCurrentTime();
+    const currentDelay = getActualDuration(player) - player.ytPlayer.getCurrentTime();
     let newDelay = currentDelay + val;
     if (newDelay < MINIMAL_DELAY) newDelay = MINIMAL_DELAY;
     seekDelay(newDelay);
-}
-
-function renderStats(duration, delay) {
-    const durationElem = document.getElementById('duration-stat');
-    const delayElem = document.getElementById('delay-stat');
-    const delayInfo = document.getElementById('delay-info');
-
-    if (duration === null || delay === null) {
-        durationElem.innerHTML = '...';
-        delayElem.innerHTML = '...';
-        delayInfo.innerHTML = '...';
-        return;
-    }
-    durationElem.innerHTML = durationToString(duration);
-    delayElem.innerHTML = durationToString(delay);
-    delayInfo.innerHTML = durationToString(delay);
-}
-
-function getNewBroadcastChannel() {
-    const bc = new BroadcastChannel(player.videoId);
-    bc.onmessage = (event) => {
-        const msg = JSON.parse(event.data);
-        if (msg.type === 'NEW_DELAY') {
-            const newDelayElem = document.getElementById('new-delay');
-            newDelayElem.value = msg.value;
-            updateDelay();
-        }
-        if (msg.type === 'ADJUST_DELAY') {
-            adjustDelay(msg.value);
-        }
-    };
-    return bc;
-}
-
-function sendStatusUpdate() {
-    const statusServer = player.statusServer;
-    if (!statusServer) {
-        return;
-    }
-    const id = player.videoId;
-    const title = player.statusTitle;
-    const delay = Math.floor(player.savedDelay);
-    const duration = Math.floor(getActualDuration());
-
-    fetch(statusServer, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id, title, delay, duration }),
-    })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error('Failed to send status');
-            }
-            return response.json();
-        })
-        .then((data) => {
-            if (data.seekDelay !== undefined) {
-                seekDelay(data.seekDelay);
-            }
-        })
-        .catch((error) => {
-            console.error('Error sending status:', error);
-        });
 }
 
 (() => {
@@ -215,8 +117,6 @@ function sendStatusUpdate() {
     document
         .querySelectorAll('.url-param')
         .forEach((elem) => elem.addEventListener('change', updateUrlParams));
-
-    player.connection = getNewBroadcastChannel();
 
     loadPlayer();
     loadPlayerAPI();
@@ -244,9 +144,10 @@ function sendStatusUpdate() {
             return;
         }
 
-        console.assert(player.videoId, !isNaN(player.savedDelay));
-        const actualDuration = getActualDuration();
+        console.assert(player.videoId && !isNaN(player.savedDelay));
         const currentTime = player.ytPlayer.getCurrentTime();
+
+        const actualDuration = getActualDuration(player);
         console.assert(!isNaN(actualDuration));
 
         // It shouldn't happen when player is ready, but just in case
@@ -268,24 +169,25 @@ function sendStatusUpdate() {
         console.assert(currentDelay > -10, 'Invalid current delay: ' + currentDelay);
 
         renderStats(actualDuration, currentDelay);
-        player.connection.postMessage(
-            JSON.stringify({ type: 'STATS', duration: actualDuration, delay: currentDelay }),
-        );
 
         if (currentDelay >= MINIMAL_DELAY) {
+            // If curent delay is more then MINIMAL_DELAY do not do anything
             if (Math.abs(player.savedDelay - currentDelay) < 2) {
                 return;
             }
             player.savedDelay = currentDelay;
             console.log('New saved delay:', currentDelay);
         } else if (currentDelay > SKIP_MARGIN) {
-            if (Math.abs(player.savedDelay - MINIMAL_DELAY) < 2) {
+            // If curent delay is betwen SKIP_MARGIN and MINIMAL_DELAY just set
+            // savedDelay to MINIMAL_DELAY and continute
+            if (player.savedDelay != MINIMAL_DELAY) {
                 return;
             }
             player.savedDelay = MINIMAL_DELAY;
             console.log('New saved delay:', MINIMAL_DELAY);
         } else {
-            const newDelay = Math.max(player.savedDelay + SKIP_CORRECTION, player.startingDelay);
+            // If curent delay is less then SKIP_MARGIN, we will seek to savedDelay
+            const newDelay = player.savedDelay + SKIP_CORRECTION;
             console.log(
                 `Current delay was: ${currentDelay}, saved delay: ${player.savedDelay}, seeking delay: ${newDelay}`,
             );
@@ -293,5 +195,5 @@ function sendStatusUpdate() {
         }
     }, 1000);
 
-    setInterval(sendStatusUpdate, 1000);
+    setInterval(() => sendStatusUpdate(player), 1000);
 })();

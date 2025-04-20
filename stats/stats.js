@@ -1,16 +1,22 @@
-function getStatsServer() {
-    return document.getElementById('stats-server').value;
-}
-
 async function fetchStats() {
-    const statsServer = getStatsServer();
-
-    if (!statsServer) {
-        return;
+    const statsServerElem = document.getElementById('stats-server');
+    const url = statsServerElem.value;
+    if (url === '' || url === 'https://') {
+        statsServerElem.classList.add('input-secondary');
+        statsServerElem.classList.remove('input-error');
+        return null;
     }
 
+    if (!URL.canParse(url)) {
+        statsServerElem.classList.add('input-error');
+        statsServerElem.classList.remove('input-secondary');
+        return null;
+    }
+    statsServerElem.classList.add('input-secondary');
+    statsServerElem.classList.remove('input-error');
+
     try {
-        const response = await fetch(statsServer);
+        const response = await fetch(url, { signal: AbortSignal.timeout(1000) });
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -33,7 +39,7 @@ function getBoxHtml(status) {
                 <span class="${err ? 'text-error' : ''}">${err ? 'Error' : delay}</span>
             </p>
             <span class="text-sm">${err ? '' : duration}</span>
-            <span class="text-secondary">|</span>
+            ${err ? '' : '<span class="text-secondary">|</span>'}
             <span class="text-sm">${err ? '' : status.id}</span>
             <p class="text-sm">${err ? err : status.ip}</p>
         </div>`;
@@ -41,6 +47,11 @@ function getBoxHtml(status) {
 
 async function renderStats() {
     const res = await fetchStats();
+
+    if (res === null) {
+        document.getElementById('boxes').innerHTML = '';
+        return;
+    }
     if (res.error) {
         res.stats = [{ error: res.error }];
     }

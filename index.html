@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Delayed YouTube</title>
     <script src="./tools.js" defer></script>
+    <script src="./render.js" defer></script>
+    <script src="./status-update.js" defer></script>
     <script src="./script.js" defer></script>
     <link rel="stylesheet" href="./output.css" />
     <link rel="icon" type="image/png" href="./logo.png" />
@@ -34,7 +36,14 @@
       <strong>Delay:</strong> <span id="delay-stat">...</span>
       <span class="mx-1">||</span>
       New Delay
-      <input type="number" class="input input-xs text-secondary w-14" placeholder="Delay" value="900" min="0" id="new-delay" />
+      <label class="input input-sm ml-2 w-fit">
+        <input required type="text" class="text-secondary w-5" placeholder="hh" value="0" id="new-delay-hour" />
+        h:
+        <input required type="text" class="text-secondary w-5" placeholder="mm" value="15" id="new-delay-min" />
+        m:
+        <input required type="text" class="text-secondary w-5" placeholder="ss" value="0" id="new-delay-sec" />
+        s
+      </label>
       <button class="btn btn-outline btn-secondary btn-xs" onclick="updateDelay()">Update</button>
       <span class="mx-1">||</span>
       <button class="btn btn-outline btn-secondary btn-xs" onclick="adjustDelay(60)">-60s</button>
@@ -49,9 +58,7 @@
     <div class="m-auto mt-10 w-fit px-1 text-center">
       <div class="my-2 w-fit">
         YouTube Video ID
-        <label class="input ml-2 w-32">
-          <input required type="text" placeholder="Enter Video ID" class="url-param text-secondary" value="jfKfPfyJRdk" id="video-id" />
-        </label>
+        <input required type="text" placeholder="Enter Video ID" class="url-param input text-secondary ml-2 w-32" value="jfKfPfyJRdk" id="video-id" />
       </div>
 
       <div class="my-2 w-fit">
@@ -68,28 +75,31 @@
       </div>
 
       <div class="my-2 w-fit">
-        Status Server (optional)
+        <div class="badge badge-neutral">Optional</div>
+        Status Server
 
-        <label class="input ml-2 w-[330px]">
-          <input
-            type="url"
-            placeholder="https://"
-            value="https://"
-            class="url-param text-secondary"
-            id="status-server"
-            name="status-server"
-            list="servers" />
-          <datalist id="servers">
-            <option value="https://192.168.154.119/delayed-yt/api/status"></option>
-          </datalist>
-        </label>
+        <input
+          type="url"
+          placeholder="https://"
+          value="https://"
+          class="url-param input text-secondary ml-2 w-[330px]"
+          id="status-server"
+          name="status-server"
+          list="servers" />
+        <datalist id="servers">
+          <option value="https://192.168.154.119/delayed-yt/api/status"></option>
+        </datalist>
       </div>
 
       <div class="my-2 w-fit">
-        Status Title (optional)
-        <label class="input ml-2 w-72">
-          <input placeholder="Enter status title" value="" class="url-param text-secondary" id="status-title" name="status-title" />
-        </label>
+        <div class="badge badge-neutral">Optional</div>
+        Status Title
+        <input
+          placeholder="Enter status title"
+          value=""
+          class="url-param input text-secondary input ml-2 w-72"
+          id="status-title"
+          name="status-title" />
       </div>
 
       <button class="btn btn-outline btn-secondary my-2" onclick="loadNewVideo()">Update</button>
@@ -102,8 +112,7 @@
       <div class="flex-none">
         <ul class="menu menu-horizontal px-1">
           <li><a href="/">Home</a></li>
-          <li><a href="/delayed-yt/controls.html">Controls</a></li>
-          <li><a href="/delayed-yt/stats.html">Stats</a></li>
+          <li><a href="/delayed-yt/stats/">Stats</a></li>
           <li><a href="https://github.com/live-miracles/delayed-yt/">GitHub</a></li>
         </ul>
       </div>
