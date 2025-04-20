@@ -133,10 +133,32 @@
         streams, the script will not correct the skipping.<br /><br />
 
         <strong>Note 2:</strong> You can't go to LIVE because the minimum delay is set to 10min. If you click the <b>LIVE</b> button, the script will
-        think that YouTube skipped and will take you back.<br /><br />
-
-        <strong>Note 3:</strong> You can set up a status server to monitor the current delay remotely. <br /><br />
+        think that YouTube skipped and will take you back.
       </p>
+      <h2>
+        <div class="badge badge-lg badge-neutral">Advanced</div>
+        Status / Stats Server
+      </h2>
+      <p>
+        You can set up a status server to remotely monitor the current delay. The web page sends a POST request with a JSON payload to the specified
+        server every second:
+      </p>
+      <pre><code class="language-json"># POST https://your-server/delayed-yt/api/status
+{
+    "id": "jfKfPfyJRdk",
+    "title": "Lofi Hip Hop Radio",
+    "delay": 900,
+    "duration": 11293995
+}</code></pre>
+      <p>
+        And in for the stats server in <a class="link" href="./stats/">stats/</a>, it expects a JSON with an array of such statuses.<br /><br />
+
+        The <code>Express</code> server endpoint code is provided in the <a class="link" href="./routes.js">routes.js</a> file. You can add this route
+        to your existing <code>Express</code> server or you can reuse our server:
+      </p>
+      <pre><code class="language-bash">git clone https://github.com/live-miracles/live-miracles.github.io.git
+cd live-miracles.github.io
+npm start</code></pre>
     </div>
 
     <footer class="footer footer-center bg-base-300 text-base-content mt-10 p-4">
