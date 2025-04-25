@@ -125,6 +125,7 @@ function adjustDelay(val) {
         e.preventDefault();
         const paste = e.clipboardData.getData('text');
         e.target.value = extractYouTubeId(paste);
+        updateUrlParams();
     };
 
     document.addEventListener('keydown', function (event) {

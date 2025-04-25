@@ -1,7 +1,7 @@
 .PHONY: *
 
 pretty:
-	npx prettier "!output.css" --write .
+	npx prettier "!*.min.css" --write .
 
 css:
-	npx @tailwindcss/cli -i ./input.css -o ./output.css --watch
+	npx @tailwindcss/cli -i ./input.css -o ./output.min.css --minify --watch
