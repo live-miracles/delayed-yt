@@ -65,41 +65,12 @@
         Starting Delay (minimum 10min)
 
         <label class="input ml-2 w-fit">
-          <input required type="number" class="url-param text-secondary w-9" placeholder="hh" value="0" min="0" id="delay-hour" />
-          h:
-          <input required type="number" class="url-param text-secondary w-9" placeholder="mm" value="15" min="0" id="delay-min" />
-          m:
-          <input required type="number" class="url-param text-secondary w-9" placeholder="ss" value="0" min="0" id="delay-sec" />
-          s
+          hour:<input required type="number" class="url-param text-secondary w-9" placeholder="hh" value="0" min="0" id="delay-hour" />
+
+          min:<input required type="number" class="url-param text-secondary w-9" placeholder="mm" value="15" min="0" id="delay-min" />
+
+          sec:<input required type="number" class="url-param text-secondary w-9" placeholder="ss" value="0" min="0" id="delay-sec" />
         </label>
-      </div>
-
-      <div class="my-2 w-fit">
-        <div class="badge badge-neutral">Optional</div>
-        Status Server
-
-        <input
-          type="url"
-          placeholder="https://"
-          value="https://"
-          class="url-param input text-secondary ml-2 w-[330px]"
-          id="status-server"
-          name="status-server"
-          list="servers" />
-        <datalist id="servers">
-          <option value="https://192.168.154.119/delayed-yt/api/status"></option>
-        </datalist>
-      </div>
-
-      <div class="my-2 w-fit">
-        <div class="badge badge-neutral">Optional</div>
-        Status Title
-        <input
-          placeholder="Enter status title"
-          value=""
-          class="url-param input text-secondary input ml-2 w-72"
-          id="status-title"
-          name="status-title" />
       </div>
 
       <button class="btn btn-outline btn-secondary my-2" onclick="loadNewVideo()">Update</button>
@@ -135,30 +106,6 @@
         <strong>Note 2:</strong> You can't go to LIVE because the minimum delay is set to 10min. If you click the <b>LIVE</b> button, the script will
         think that YouTube skipped and will take you back.
       </p>
-      <h2>
-        <div class="badge badge-lg badge-neutral">Advanced</div>
-        Status / Stats Server
-      </h2>
-      <p>
-        You can set up a status server to remotely monitor the current delay. The web page sends a POST request with a JSON payload to the specified
-        server every second:
-      </p>
-      <pre><code class="language-json"># POST https://your-server/delayed-yt/api/status
-{
-    "id": "jfKfPfyJRdk",
-    "title": "Lofi Hip Hop Radio",
-    "delay": 900,
-    "duration": 11293995
-}</code></pre>
-      <p>
-        And in for the stats server in <a class="link" href="./stats/">stats/</a>, it expects a JSON with an array of such statuses.<br /><br />
-
-        The <code>Express</code> server endpoint code is provided in the <a class="link" href="./routes.js">routes.js</a> file. You can add this route
-        to your existing <code>Express</code> server or you can reuse our server:
-      </p>
-      <pre><code class="language-bash">git clone https://github.com/live-miracles/live-miracles.github.io.git
-cd live-miracles.github.io
-npm start</code></pre>
     </div>
 
     <footer class="footer footer-center bg-base-300 text-base-content mt-10 p-4">

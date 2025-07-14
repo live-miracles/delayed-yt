@@ -28,7 +28,7 @@ function durationToString(duration) {
     const h = Math.floor(dur / 3600);
     const m = Math.floor((dur % 3600) / 60);
     const s = Math.floor(dur % 60);
-    return `${h > 0 ? h + 'h:' : ''}${h > 0 || m > 0 ? m + 'm:' : ''}${s}s`;
+    return `${h > 0 ? h + 'h ' : ''}${h > 0 || m > 0 ? m + 'm ' : ''}${s}s`;
 }
 
 // ===== Document Config & URL Utils =====

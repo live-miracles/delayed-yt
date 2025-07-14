@@ -2,14 +2,6 @@ function getVideoId() {
     return document.getElementById('video-id').value;
 }
 
-function getStatusTitle() {
-    return document.getElementById('status-title').value;
-}
-
-function getStatusServer() {
-    return document.getElementById('status-server').value;
-}
-
 function getDelay() {
     const delayH = parseInt(document.getElementById('delay-hour').value);
     const delayM = parseInt(document.getElementById('delay-min').value);
@@ -42,9 +34,9 @@ function renderStats(duration, delay) {
     const delayInfo = document.getElementById('delay-info');
 
     if (duration === null || delay === null) {
-        durationElem.innerHTML = '?:?';
-        delayElem.innerHTML = '?:?';
-        delayInfo.innerHTML = '?:?';
+        durationElem.innerHTML = '???';
+        delayElem.innerHTML = '???';
+        delayInfo.innerHTML = '???';
         return;
     }
     durationElem.innerHTML = durationToString(duration);

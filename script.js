@@ -21,8 +21,6 @@ const player = {
 
 function updatePlayerData() {
     player.videoId = getVideoId();
-    player.statusServer = getStatusServer();
-    player.statusTitle = getStatusTitle();
     player.startingDelay = getDelay();
     // We need to negate SKIP_CORRECTION to the saved delay because when the player loads
     // the script will think it got skipped to live, and apply the SKIP_CORRECTION
