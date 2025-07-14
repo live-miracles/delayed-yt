@@ -37,12 +37,14 @@
       <span class="mx-1">||</span>
       New Delay
       <label class="input input-sm ml-2 w-fit">
-        <input required type="text" class="text-secondary w-5" placeholder="hh" value="0" id="new-delay-hour" />
-        h:
-        <input required type="text" class="text-secondary w-5" placeholder="mm" value="15" id="new-delay-min" />
-        m:
-        <input required type="text" class="text-secondary w-5" placeholder="ss" value="0" id="new-delay-sec" />
-        s
+        h:<input required type="text" class="text-secondary w-5" placeholder="hh" value="0" id="new-delay-hour" /> m:<input
+          required
+          type="text"
+          class="text-secondary w-5"
+          placeholder="mm"
+          value="15"
+          id="new-delay-min" />
+        s:<input required type="text" class="text-secondary w-5" placeholder="ss" value="0" id="new-delay-sec" />
       </label>
       <button class="btn btn-outline btn-secondary btn-xs" onclick="updateDelay()">Update</button>
       <span class="mx-1">||</span>
@@ -62,7 +64,7 @@
       </div>
 
       <div class="my-2 w-fit">
-        Starting Delay (minimum 10min)
+        Starting Delay (minimum 10 min)
 
         <label class="input ml-2 w-fit">
           hour:<input required type="number" class="url-param text-secondary w-9" placeholder="hh" value="0" min="0" id="delay-hour" />
