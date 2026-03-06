@@ -45,7 +45,6 @@ function onPlayerStateChange(event) {
             player.startingDate = getCurrentDate();
             player.startingDuration = duration;
             console.log('Player started. Duration:', player.startingDuration);
-            loadNewVideo();
         }
         player.isReady = true;
     }
@@ -53,6 +52,7 @@ function onPlayerStateChange(event) {
 
 // ===== Player Logic =====
 function updatePlayerData() {
+    player.isReady = false;
     player.videoId = getVideoId();
     player.startingDelay = getDelay();
     // We need to negate SKIP_CORRECTION to the saved delay because when the player loads
@@ -61,10 +61,13 @@ function updatePlayerData() {
 }
 
 function getActualDuration(player) {
-    if (player.startingDuration <= 0) {
+    if (player.startingDuration < 0) {
         console.error('Invalid duration:', player.startingDuration);
         return 0;
     }
+
+    if (player.startingDuration === 0) return 0;
+
     if (player.startingDate <= 0) {
         console.error('Invalid time:', player.startingDate);
         return 0;
@@ -190,9 +193,17 @@ const player = {
 
     setInterval(() => {
         // First 30min after stream started player.getDuration() will always return 3600
-        if (!player.isReady || player.startingDuration === 0) {
+        if (!player.isReady) {
             renderStats(null, null);
             return;
+        }
+
+        // If duration is 0 it means stream started less than 30 min ago.
+        if (player.startingDuration === 0) {
+            if (getCurrentDate() - player.startingDate > 5 * 60) {
+                location.reload();
+            }
+            document.querySelector('.alert').classList.remove('hidden');
         }
 
         console.assert(player.videoId && !isNaN(player.savedDelay));
