@@ -8,24 +8,7 @@ const STREAM_DURATION_CORRECTION = 3600;
 
 const DEFAULT_VIDEO_ID = 'jfKfPfyJRdk';
 
-const player = {
-    ytPlayer: null,
-    isReady: false,
-    startingDuration: -100,
-    startingDate: -100,
-    videoId: '',
-    statusTitle: '',
-    startingDelay: -100,
-    savedDelay: -100,
-};
-
-function updatePlayerData() {
-    player.videoId = getVideoId();
-    player.startingDelay = getDelay();
-    // We need to negate SKIP_CORRECTION to the saved delay because when the player loads
-    // the script will think it got skipped to live, and apply the SKIP_CORRECTION
-    player.savedDelay = getDelay() - SKIP_CORRECTION;
-}
+// ===== YouTube Player API =====
 function loadPlayer() {
     updatePlayerData();
     const playerElem = document.getElementById('player');
@@ -66,6 +49,15 @@ function onPlayerStateChange(event) {
         }
         player.isReady = true;
     }
+}
+
+// ===== Player Logic =====
+function updatePlayerData() {
+    player.videoId = getVideoId();
+    player.startingDelay = getDelay();
+    // We need to negate SKIP_CORRECTION to the saved delay because when the player loads
+    // the script will think it got skipped to live, and apply the SKIP_CORRECTION
+    player.savedDelay = getDelay() - SKIP_CORRECTION;
 }
 
 function getActualDuration(player) {
@@ -110,29 +102,89 @@ function adjustDelay(val) {
     seekDelay(newDelay);
 }
 
+// ===== User Inputs ====
+function getVideoId() {
+    return document.getElementById('v').value;
+}
+
+function getDelay() {
+    const delayH = parseInt(document.getElementById('h').value);
+    const delayM = parseInt(document.getElementById('m').value);
+    const delayS = parseInt(document.getElementById('s').value);
+    const delay = delayH * 3600 + delayM * 60 + delayS;
+    console.assert(delay >= MINIMAL_DELAY);
+    if (delay < MINIMAL_DELAY) {
+        console.error(`Delay shouldn't be less than ${MINIMAL_DELAY}s`);
+        return MINIMAL_DELAY;
+    }
+    return delay;
+}
+
+function getNewDelay() {
+    const delayH = parseInt(document.getElementById('new-delay-hour').value);
+    const delayM = parseInt(document.getElementById('new-delay-min').value);
+    const delayS = parseInt(document.getElementById('new-delay-sec').value);
+    const delay = delayH * 3600 + delayM * 60 + delayS;
+    console.assert(delay >= MINIMAL_DELAY);
+    if (delay < MINIMAL_DELAY) {
+        console.error(`Delay shouldn't be less than ${MINIMAL_DELAY}s`);
+        return MINIMAL_DELAY;
+    }
+    return delay;
+}
+
+// ===== Rendering =====
+function renderStats(duration, delay) {
+    const durationElem = document.getElementById('duration-stat');
+    const delayElem = document.getElementById('delay-stat');
+    const delayInfo = document.getElementById('delay-info');
+
+    if (duration === null || delay === null) {
+        durationElem.innerHTML = '???';
+        delayElem.innerHTML = '???';
+        delayInfo.innerHTML = '???';
+        return;
+    }
+    durationElem.innerHTML = durationToString(duration);
+    delayElem.innerHTML = durationToString(delay);
+    delayInfo.innerHTML = durationToString(delay);
+}
+
+// =====
+// ===== Execution =====
+// =====
+
+const player = {
+    ytPlayer: null,
+    isReady: false,
+    startingDuration: -100,
+    startingDate: -100,
+    videoId: '',
+    startingDelay: -100,
+    savedDelay: -100,
+};
+
 (() => {
-    setInputElements();
+    setDocumentUrlParams();
     document
         .querySelectorAll('.url-param')
-        .forEach((elem) => elem.addEventListener('change', updateUrlParams));
+        .forEach((elem) => elem.addEventListener('change', updateUrlParam));
 
     loadPlayer();
     loadPlayerAPI();
 
-    document.getElementById('video-id').onpaste = (e) => {
+    document.getElementById('v').onpaste = (e) => {
         e.preventDefault();
         const paste = e.clipboardData.getData('text');
         e.target.value = extractYouTubeId(paste);
-        updateUrlParams();
+        updateUrlParam(e);
     };
 
     document.addEventListener('keydown', function (event) {
         if (event.key === 'd' || event.key === 'D') {
             const delayDiv = document.getElementById('delay-info');
             delayDiv.classList.remove('hidden');
-            setTimeout(() => {
-                delayDiv.classList.add('hidden');
-            }, 2000);
+            setTimeout(() => delayDiv.classList.add('hidden'), 2000);
         }
     });
 
@@ -170,22 +222,22 @@ function adjustDelay(val) {
         renderStats(actualDuration, currentDelay);
 
         if (currentDelay >= MINIMAL_DELAY) {
-            // If curent delay is more then MINIMAL_DELAY do not do anything
+            // If current delay is more then MINIMAL_DELAY do not do anything
             if (Math.abs(player.savedDelay - currentDelay) < 2) {
                 return;
             }
             player.savedDelay = currentDelay;
             console.log('New saved delay:', currentDelay);
         } else if (currentDelay > SKIP_MARGIN) {
-            // If curent delay is betwen SKIP_MARGIN and MINIMAL_DELAY just set
-            // savedDelay to MINIMAL_DELAY and continute
+            // If current delay is between SKIP_MARGIN and MINIMAL_DELAY just set
+            // savedDelay to MINIMAL_DELAY and continue
             if (player.savedDelay === MINIMAL_DELAY) {
                 return;
             }
             player.savedDelay = MINIMAL_DELAY;
             console.log('New saved delay:', MINIMAL_DELAY);
         } else {
-            // If curent delay is less then SKIP_MARGIN, we will seek to savedDelay
+            // If current delay is less then SKIP_MARGIN, we will seek to savedDelay
             const newDelay = player.savedDelay + SKIP_CORRECTION;
             console.log(
                 `Current delay was: ${currentDelay}, saved delay: ${player.savedDelay}, seeking delay: ${newDelay}`,
@@ -193,6 +245,4 @@ function adjustDelay(val) {
             seekDelay(newDelay);
         }
     }, 1000);
-
-    setInterval(() => sendStatusUpdate(player), 1000);
 })();

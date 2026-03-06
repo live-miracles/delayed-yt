@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Delayed YouTube</title>
     <script src="./tools.js" defer></script>
-    <script src="./render.js" defer></script>
-    <script src="./status-update.js" defer></script>
     <script src="./script.js" defer></script>
-    <link rel="stylesheet" href="./output.min.css" />
+    <link rel="stylesheet" href="./output.css" />
     <link rel="icon" type="image/png" href="./logo.png" />
   </head>
   <body class="scrollbar-none">
@@ -60,18 +58,18 @@
     <div class="m-auto mt-10 w-fit px-1 text-center">
       <div class="my-2 w-fit">
         YouTube Video ID
-        <input required type="text" placeholder="Enter Video ID" class="url-param input text-secondary ml-2 w-32" value="jfKfPfyJRdk" id="video-id" />
+        <input required type="text" placeholder="Enter Video ID" class="url-param input text-secondary ml-2 w-32" value="jfKfPfyJRdk" id="v" />
       </div>
 
       <div class="my-2 w-fit">
         Starting Delay (minimum 10 min)
 
         <label class="input ml-2 w-fit">
-          hour:<input required type="number" class="url-param text-secondary w-9" placeholder="hh" value="0" min="0" id="delay-hour" />
+          hour:<input required type="number" class="url-param text-secondary w-9" placeholder="hh" value="0" min="0" id="h" />
 
-          min:<input required type="number" class="url-param text-secondary w-9" placeholder="mm" value="15" min="0" id="delay-min" />
+          min:<input required type="number" class="url-param text-secondary w-9" placeholder="mm" value="15" min="0" id="m" />
 
-          sec:<input required type="number" class="url-param text-secondary w-9" placeholder="ss" value="0" min="0" id="delay-sec" />
+          sec:<input required type="number" class="url-param text-secondary w-9" placeholder="ss" value="0" min="0" id="s" />
         </label>
       </div>
 
@@ -85,7 +83,6 @@
       <div class="flex-none">
         <ul class="menu menu-horizontal px-1">
           <li><a href="/">Home</a></li>
-          <li><a href="/delayed-yt/stats/">Stats</a></li>
           <li><a href="https://github.com/live-miracles/delayed-yt/">GitHub</a></li>
         </ul>
       </div>
