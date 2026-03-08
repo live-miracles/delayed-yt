@@ -669,16 +669,6 @@
   .mx-auto {
     margin-inline: auto;
   }
-  .input-sm {
-    --size: calc(var(--size-field, 0.25rem) * 8);
-    font-size: 0.75rem;
-    &[type="number"] {
-      &::-webkit-inner-spin-button {
-        margin-block: calc(0.25rem * -2);
-        margin-inline-end: calc(0.25rem * -3);
-      }
-    }
-  }
   .my-2 {
     margin-block: calc(var(--spacing) * 2);
   }
@@ -1256,9 +1246,6 @@
   .h-full {
     height: 100%;
   }
-  .w-5 {
-    width: calc(var(--spacing) * 5);
-  }
   .w-6 {
     width: calc(var(--spacing) * 6);
   }
@@ -1273,6 +1260,9 @@
   }
   .w-full {
     width: 100%;
+  }
+  .min-w-\[700px\] {
+    min-width: 700px;
   }
   .flex-1 {
     flex: 1;
@@ -1328,6 +1318,9 @@
   }
   .px-1 {
     padding-inline: calc(var(--spacing) * 1);
+  }
+  .px-3 {
+    padding-inline: calc(var(--spacing) * 3);
   }
   .px-4 {
     padding-inline: calc(var(--spacing) * 4);

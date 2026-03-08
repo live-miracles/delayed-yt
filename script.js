@@ -93,11 +93,6 @@ function seekDelay(delay) {
     player.isReady = false;
 }
 
-function updateDelay() {
-    const newDelay = getNewDelay();
-    seekDelay(newDelay < MINIMAL_DELAY ? MINIMAL_DELAY : newDelay);
-}
-
 function adjustDelay(val) {
     const currentDelay = getActualDuration(player) - player.ytPlayer.getCurrentTime();
     let newDelay = currentDelay + val;
@@ -114,19 +109,6 @@ function getDelay() {
     const delayH = parseInt(document.getElementById('h').value);
     const delayM = parseInt(document.getElementById('m').value);
     const delayS = parseInt(document.getElementById('s').value);
-    const delay = delayH * 3600 + delayM * 60 + delayS;
-    console.assert(delay >= MINIMAL_DELAY);
-    if (delay < MINIMAL_DELAY) {
-        console.error(`Delay shouldn't be less than ${MINIMAL_DELAY}s`);
-        return MINIMAL_DELAY;
-    }
-    return delay;
-}
-
-function getNewDelay() {
-    const delayH = parseInt(document.getElementById('new-delay-hour').value);
-    const delayM = parseInt(document.getElementById('new-delay-min').value);
-    const delayS = parseInt(document.getElementById('new-delay-sec').value);
     const delay = delayH * 3600 + delayM * 60 + delayS;
     console.assert(delay >= MINIMAL_DELAY);
     if (delay < MINIMAL_DELAY) {

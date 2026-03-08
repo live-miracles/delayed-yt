@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="./output.css" />
     <link rel="icon" type="image/png" href="./logo.png" />
   </head>
-  <body class="scrollbar-none">
+  <body class="scrollbar-none min-w-[700px]">
     <div role="alert" class="alert alert-warning fixed top-4 left-1/2 z-50 hidden w-fit -translate-x-1/2">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
         <path
@@ -38,24 +38,10 @@
       ...
     </div>
 
-    <div id="controls" class="mx-auto mt-5 w-fit">
-      <span class="mx-1">||</span>
+    <div id="controls" class="mx-auto mt-5 w-fit text-center">
       <strong>Duration:</strong> <span id="duration-stat">...</span>
       <span class="mx-1">||</span>
       <strong>Delay:</strong> <span id="delay-stat">...</span>
-      <span class="mx-1">||</span>
-      New Delay
-      <label class="input input-sm ml-2 w-fit">
-        h:<input required type="text" class="text-secondary w-5" placeholder="hh" value="0" id="new-delay-hour" /> m:<input
-          required
-          type="text"
-          class="text-secondary w-5"
-          placeholder="mm"
-          value="15"
-          id="new-delay-min" />
-        s:<input required type="text" class="text-secondary w-5" placeholder="ss" value="0" id="new-delay-sec" />
-      </label>
-      <button class="btn btn-outline btn-secondary btn-xs" onclick="updateDelay()">Update</button>
       <span class="mx-1">||</span>
       <button class="btn btn-outline btn-secondary btn-xs" onclick="adjustDelay(60)">-60s</button>
       <button class="btn btn-outline btn-secondary btn-xs" onclick="adjustDelay(30)">-30s</button>
@@ -63,7 +49,6 @@
       <button class="btn btn-secondary btn-xs" onclick="adjustDelay(-10)">+10s</button>
       <button class="btn btn-secondary btn-xs" onclick="adjustDelay(-30)">+30s</button>
       <button class="btn btn-secondary btn-xs" onclick="adjustDelay(-60)">+60s</button>
-      <span class="mx-1">||</span>
     </div>
 
     <div class="m-auto mt-10 w-fit px-1 text-center">
@@ -94,12 +79,13 @@
       <div class="flex-none">
         <ul class="menu menu-horizontal px-1">
           <li><a href="/">Home</a></li>
+          <li><a href="/stable/delayed-yt/">Stable</a></li>
           <li><a href="https://github.com/live-miracles/delayed-yt/">GitHub</a></li>
         </ul>
       </div>
     </div>
 
-    <div class="prose mx-auto">
+    <div class="prose mx-auto px-3">
       <p>
         This website addresses the
         <strong>skipping issue</strong> in YouTube for delayed streams.<br /><br />
