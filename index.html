@@ -85,23 +85,44 @@
       </div>
     </div>
 
-    <div class="prose mx-auto px-3">
+    <div class="prose mx-auto max-w-[700px] px-3">
       <p>
         This website addresses the
         <strong>skipping issue</strong> in YouTube for delayed streams.<br /><br />
 
         <strong>What is the skip issue?</strong> If you are currently watching a stream that is 15min behind LIVE and you face some network
-        fluctuations, YouTube may jump to LIVE (i.e. 0sec delay) and those 15min will be lost.<br /><br />
+        fluctuations, YouTube may jump to LIVE (i.e. 0sec delay) and those 15min will be lost. But if you are using YAD and YouTube tries to jump to
+        LIVE, <b>the script will automatically bring you back</b>, so you will not miss anything!<br /><br />
 
-        But if you are using YAD and YouTube tries to jump to LIVE, <b>the script will automatically bring you back</b>, so you will not miss
-        anything!<br /><br />
-
-        <strong>Note 1:</strong> Due to YouTube limitations, the script only works for streams that started at least 30min ago. For newly started
-        streams, the script will not correct the skipping.<br /><br />
-
-        <strong>Note 2:</strong> You can't go to LIVE because the minimum delay is set to 10min. If you click the <b>LIVE</b> button, the script will
+        <strong>Note:</strong> You can't go to LIVE because the minimum delay is set to 10min. If you click the <b>LIVE</b> button, the script will
         think that YouTube skipped and will take you back.
       </p>
+
+      <h2>Known Issues</h2>
+      <ol>
+        <li>
+          Due to YouTube Player API limitations, the script only works for streams that started at least 30min ago. For newly started streams, the
+          script will not correct the skipping.
+        </li>
+        <li>
+          If the RTMP stream stops for any reason, YouTube will cut out that part. You will then need to manually refresh the script to correct the
+          delay. For example, if you were watching a stream with a 15 min delay and stopped streaming for 5 min, the delay would actually be 10 min.
+        </li>
+
+        <li>
+          YouTube may ask you to sign in to confirm that you are not a bot.
+          <ul>
+            <li>
+              If you are using vMix, click the YouTube logo in the bottom right corner to sign in to your Gmail account. After signing in, right-click
+              on the input and select "Properties." Then, update the URL.
+            </li>
+            <li>
+              If you are using OBS, create one more browser input with the URL "youtube.com," sign in there, and refresh the script webpage.
+              Afterwards, you can delete the second input.
+            </li>
+          </ul>
+        </li>
+      </ol>
     </div>
 
     <footer class="footer footer-center bg-base-300 text-base-content mt-10 p-4">
