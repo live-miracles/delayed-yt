@@ -5,6 +5,7 @@ const SKIP_MARGIN = 500;
 const START_MARGIN = 30;
 const SKIP_CORRECTION = 5;
 const STREAM_DURATION_CORRECTION = 3600;
+const DELAY_DIFF_MARGIN = 60;
 
 const DEFAULT_VIDEO_ID = 'jfKfPfyJRdk';
 
@@ -55,6 +56,7 @@ function updatePlayerData() {
     player.isReady = false;
     player.videoId = getVideoId();
     player.startingDelay = getDelay();
+    player.allowDelayChange = getAllowDelayChange();
     // We need to negate SKIP_CORRECTION to the saved delay because when the player loads
     // the script will think it got skipped to live, and apply the SKIP_CORRECTION
     player.savedDelay = getDelay() - SKIP_CORRECTION;
@@ -88,9 +90,9 @@ function seekDelay(delay) {
     }
     console.assert(delay >= MINIMAL_DELAY);
     const newTime = getActualDuration(player) - delay;
-    console.log('Seeking to a new delay: ' + delay + ', at time:' + newTime);
-    player.ytPlayer.seekTo(newTime);
+    console.log('Seeking to a new delay: ' + delay + ', at time: ' + newTime);
     player.isReady = false;
+    player.ytPlayer.seekTo(newTime);
 }
 
 function adjustDelay(val) {
@@ -116,6 +118,10 @@ function getDelay() {
         return MINIMAL_DELAY;
     }
     return delay;
+}
+
+function getAllowDelayChange() {
+    return document.getElementById('c').checked;
 }
 
 // ===== Rendering =====
@@ -147,6 +153,7 @@ const player = {
     videoId: '',
     startingDelay: -100,
     savedDelay: -100,
+    allowDelayChange: false,
 };
 
 (() => {
@@ -165,17 +172,25 @@ const player = {
         updateUrlParam(e);
     };
 
+    const alertElem = document.querySelector('.alert');
+    const delayDiv = document.getElementById('delay-info');
+    const showDelayInput = document.getElementById('d');
+
     document.addEventListener('keydown', function (event) {
         if (event.key === 'd' || event.key === 'D') {
-            const delayDiv = document.getElementById('delay-info');
-            delayDiv.classList.remove('hidden');
-            setTimeout(() => delayDiv.classList.add('hidden'), 2000);
+            showDelayInput.checked = !showDelayInput.checked;
         }
     });
 
     setInterval(() => {
-        // First 30min after stream started player.getDuration() will always return 3600
+        if (showDelayInput.checked) {
+            delayDiv.classList.remove('hidden');
+        } else {
+            delayDiv.classList.add('hidden');
+        }
+
         if (!player.isReady) {
+            console.log(new Date().toLocaleTimeString() + ' | Player not ready');
             renderStats(null, null);
             return;
         }
@@ -185,20 +200,34 @@ const player = {
             if (getCurrentDate() - player.startingDate > 5 * 60) {
                 location.reload();
             }
-            document.querySelector('.alert').classList.remove('hidden');
+            alertElem.classList.remove('hidden');
+            renderStats(null, null);
+            return;
         }
 
         console.assert(player.videoId && !isNaN(player.savedDelay));
         const currentTime = player.ytPlayer.getCurrentTime();
+        const timestamp = new Date().toLocaleTimeString();
 
         const actualDuration = getActualDuration(player);
-        console.assert(!isNaN(actualDuration));
-
-        // It shouldn't happen when player is ready, but just in case
-        if (isNaN(currentTime)) {
+        if (isNaN(actualDuration)) {
+            console.error(timestamp + ' | Invalid actualDuration: ' + actualDuration);
             renderStats(null, null);
             return;
         }
+
+        // It shouldn't happen when player is ready, but just in case
+        if (isNaN(currentTime)) {
+            console.error(timestamp + ' | Invalid currentTime: ' + currentTime);
+            renderStats(null, null);
+            return;
+        }
+
+        const currentDelay = actualDuration - currentTime;
+        console.assert(currentDelay > -10, 'Invalid current delay: ' + currentDelay);
+
+        renderStats(actualDuration, currentDelay);
+
         // If stream started recently and didn't reach starting delay yet
         if (actualDuration < player.startingDelay) {
             return;
@@ -209,18 +238,25 @@ const player = {
             return;
         }
 
-        const currentDelay = actualDuration - currentTime;
-        console.assert(currentDelay > -10, 'Invalid current delay: ' + currentDelay);
-
-        renderStats(actualDuration, currentDelay);
-
-        if (currentDelay >= MINIMAL_DELAY) {
+        if (
+            !player.allowDelayChange &&
+            Math.abs(currentDelay - player.startingDelay) > DELAY_DIFF_MARGIN
+        ) {
+            let newDelay = player.savedDelay + SKIP_CORRECTION;
+            if (Math.abs(newDelay - player.startingDelay) > DELAY_DIFF_MARGIN)
+                newDelay = player.startingDelay;
+            console.log(
+                timestamp +
+                    ` | Current delay was: ${currentDelay}, saved: ${player.savedDelay}, seeking: ${newDelay}`,
+            );
+            seekDelay(newDelay);
+        } else if (currentDelay >= MINIMAL_DELAY) {
             // If current delay is more then MINIMAL_DELAY do not do anything
             if (Math.abs(player.savedDelay - currentDelay) < 2) {
                 return;
             }
             player.savedDelay = currentDelay;
-            console.log('New saved delay:', currentDelay);
+            console.log(timestamp + ' | New saved delay: ' + currentDelay);
         } else if (currentDelay > SKIP_MARGIN) {
             // If current delay is between SKIP_MARGIN and MINIMAL_DELAY just set
             // savedDelay to MINIMAL_DELAY and continue
@@ -228,12 +264,13 @@ const player = {
                 return;
             }
             player.savedDelay = MINIMAL_DELAY;
-            console.log('New saved delay:', MINIMAL_DELAY);
+            console.log(timestamp + ' | New saved delay: ' + MINIMAL_DELAY);
         } else {
             // If current delay is less then SKIP_MARGIN, we will seek to savedDelay
             const newDelay = player.savedDelay + SKIP_CORRECTION;
             console.log(
-                `Current delay was: ${currentDelay}, saved delay: ${player.savedDelay}, seeking delay: ${newDelay}`,
+                timestamp +
+                    ` | Skipping detected. Current delay was: ${currentDelay}, saved: ${player.savedDelay}, seeking: ${newDelay}`,
             );
             seekDelay(newDelay);
         }
