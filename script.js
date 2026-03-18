@@ -124,6 +124,23 @@ function getAllowDelayChange() {
     return document.getElementById('c').checked;
 }
 
+function getShowDelay() {
+    return document.getElementById('d').checked;
+}
+
+function toggleShowDelay() {
+    document.getElementById('d').checked = !getShowDelay();
+
+    const delayInfo = document.getElementById('delay-info');
+    if (getShowDelay()) {
+        delayInfo.classList.add('opacity-30');
+        delayInfo.classList.remove('opacity-0');
+    } else {
+        delayInfo.classList.add('opacity-0');
+        delayInfo.classList.remove('opacity-30');
+    }
+}
+
 // ===== Rendering =====
 function renderStats(duration, delay) {
     const durationElem = document.getElementById('duration-stat');
@@ -173,22 +190,13 @@ const player = {
     };
 
     const alertElem = document.querySelector('.alert');
-    const delayDiv = document.getElementById('delay-info');
-    const showDelayInput = document.getElementById('d');
+    document.getElementById('delay-info').addEventListener('click', toggleShowDelay);
 
     document.addEventListener('keydown', function (event) {
-        if (event.key === 'd' || event.key === 'D') {
-            showDelayInput.checked = !showDelayInput.checked;
-        }
+        if (event.key === 'd' || event.key === 'D') toggleShowDelay();
     });
 
     setInterval(() => {
-        if (showDelayInput.checked) {
-            delayDiv.classList.remove('hidden');
-        } else {
-            delayDiv.classList.add('hidden');
-        }
-
         if (!player.isReady) {
             console.log(new Date().toLocaleTimeString() + ' | Player not ready');
             renderStats(null, null);
