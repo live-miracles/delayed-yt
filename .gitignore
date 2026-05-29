@@ -1,0 +1,9 @@
+node_modules
+.DS_Store
+dist
+public/js
+public/output.css
+build-test
+coverage
+*.tsbuildinfo
+output.css

@@ -1,0 +1,30 @@
+{
+  "name": "delayed-yt",
+  "version": "1.0.0",
+  "description": "Static delayed YouTube player for GitHub Pages.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "clean": "rimraf public/js public/output.css",
+    "build": "npm run clean && tsc -p tsconfig.app.json && tailwindcss -i ./public/input.css -o ./public/output.css",
+    "dev": "node build-tools/dev.mjs",
+    "typecheck": "tsc -p tsconfig.app.json --noEmit",
+    "test": "npm run build && npm run typecheck",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.2.1",
+    "@tailwindcss/typography": "^0.5.19",
+    "@types/node": "^25.5.0",
+    "browser-sync": "^3.0.4",
+    "concurrently": "^9.2.1",
+    "daisyui": "^5.5.19",
+    "execa": "^9.6.0",
+    "prettier": "^3.8.1",
+    "prettier-plugin-tailwindcss": "^0.7.2",
+    "rimraf": "^6.1.2",
+    "tailwindcss": "^4.2.1",
+    "typescript": "^5.9.3"
+  }
+}

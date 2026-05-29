@@ -1,0 +1,89 @@
+name: Build and deploy
+
+on:
+  push:
+    branches:
+      - master
+      - stable
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          path: master
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: master/package-lock.json
+
+      - name: Install dependencies
+        working-directory: master
+        run: npm ci
+
+      - name: Run tests
+        working-directory: master
+        run: npm test
+
+      - name: Stage master site
+        run: |
+          mkdir -p site
+          cp -a master/public/. site/
+
+      - name: Check for stable branch
+        id: stable-branch
+        working-directory: master
+        run: |
+          if git ls-remote --exit-code origin refs/heads/stable >/dev/null 2>&1; then
+              echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+              echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check out stable
+        if: steps.stable-branch.outputs.exists == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: stable
+          path: stable
+
+      - name: Install stable dependencies
+        if: steps.stable-branch.outputs.exists == 'true'
+        working-directory: stable
+        run: npm ci
+
+      - name: Build stable site
+        if: steps.stable-branch.outputs.exists == 'true'
+        working-directory: stable
+        run: npm run build
+
+      - name: Stage stable site
+        if: steps.stable-branch.outputs.exists == 'true'
+        run: |
+          mkdir -p site/stable
+          cp -a stable/public/. site/stable/
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./site
