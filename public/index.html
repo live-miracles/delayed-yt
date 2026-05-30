@@ -54,7 +54,7 @@
       ></iframe>
       <div
         id="player-placeholder"
-        class="absolute flex h-full w-full items-center justify-center bg-base-300 text-center text-xl text-base-content"
+        class="absolute hidden flex h-full w-full items-center justify-center bg-base-300 text-center text-xl text-base-content"
       >
         Configure a YouTube video ID to start the delayed player.
       </div>
@@ -67,136 +67,251 @@
       ...
     </div>
 
-    <div id="controls" class="mx-auto mt-5 w-fit text-center">
-      <strong>Duration:</strong> <span id="duration-stat">...</span>
-      <span class="mx-1">||</span>
-      <strong>Delay:</strong> <span id="delay-stat">...</span>
-      <span class="mx-1">||</span>
-      <button
-        class="btn btn-outline btn-secondary btn-xs"
-        data-delay-adjust="60"
+    <section
+      class="mx-auto mt-5 grid w-[min(94vw,760px)] gap-3 px-3"
+      aria-label="Player setup"
+    >
+      <div
+        id="controls"
+        class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-base-300 bg-base-200/70 px-4 py-2 shadow-lg"
       >
-        -60s
-      </button>
-      <button
-        class="btn btn-outline btn-secondary btn-xs"
-        data-delay-adjust="30"
+        <div class="stats stats-horizontal bg-transparent shadow-none">
+          <div class="stat px-2 py-0">
+            <div id="duration-stat-title" class="stat-title text-xs">
+              Duration
+            </div>
+            <div id="duration-stat" class="stat-value text-base">...</div>
+          </div>
+          <div class="stat px-2 py-0">
+            <div id="delay-stat-title" class="stat-title text-xs">Delay</div>
+            <div id="delay-stat" class="stat-value text-base text-secondary">
+              ...
+            </div>
+          </div>
+        </div>
+
+        <div class="join">
+          <button
+            class="btn btn-outline btn-secondary join-item btn-sm"
+            data-delay-adjust="60"
+          >
+            -60s
+          </button>
+          <button
+            class="btn btn-outline btn-secondary join-item btn-sm"
+            data-delay-adjust="30"
+          >
+            -30s
+          </button>
+          <button
+            class="btn btn-outline btn-secondary join-item btn-sm"
+            data-delay-adjust="10"
+          >
+            -10s
+          </button>
+          <button
+            class="btn btn-secondary join-item btn-sm"
+            data-delay-adjust="-10"
+          >
+            +10s
+          </button>
+          <button
+            class="btn btn-secondary join-item btn-sm"
+            data-delay-adjust="-30"
+          >
+            +30s
+          </button>
+          <button
+            class="btn btn-secondary join-item btn-sm"
+            data-delay-adjust="-60"
+          >
+            +60s
+          </button>
+        </div>
+      </div>
+
+      <div
+        class="rounded-lg border border-base-300 bg-base-200 px-4 py-3 text-base-content shadow-xl"
       >
-        -30s
-      </button>
-      <button
-        class="btn btn-outline btn-secondary btn-xs"
-        data-delay-adjust="10"
-      >
-        -10s
-      </button>
-      <button class="btn btn-secondary btn-xs" data-delay-adjust="-10">
-        +10s
-      </button>
-      <button class="btn btn-secondary btn-xs" data-delay-adjust="-30">
-        +30s
-      </button>
-      <button class="btn btn-secondary btn-xs" data-delay-adjust="-60">
-        +60s
-      </button>
-    </div>
+        <div
+          class="grid gap-3 md:grid-cols-[auto_1fr_auto_auto] md:items-center"
+        >
+          <span class="font-semibold whitespace-nowrap">Video ID</span>
 
-    <div class="m-auto mt-10 w-fit px-1 text-center">
-      <div class="my-2 w-fit">
-        YouTube Video ID
-        <input
-          required
-          type="text"
-          placeholder="Enter Video ID"
-          class="url-param input text-secondary ml-2 w-32"
-          value=""
-          id="v"
-        />
+          <label class="form-control w-full">
+            <input
+              required
+              type="text"
+              placeholder="Enter video ID or paste a YouTube URL"
+              class="url-param input input-bordered input-secondary w-full"
+              value=""
+              id="v"
+            />
+          </label>
+
+          <label
+            class="flex min-h-12 items-center justify-between gap-3 rounded-md bg-base-300 px-3 py-2"
+          >
+            <span class="font-medium">Live</span>
+            <input
+              type="checkbox"
+              class="toggle toggle-secondary toggle-sm url-param"
+              id="r"
+            />
+            <span class="font-medium">Video</span>
+          </label>
+
+          <button id="update-video" class="btn btn-secondary min-w-36">
+            Update
+          </button>
+        </div>
+
+        <fieldset class="mt-3">
+          <div class="grid gap-2 md:grid-cols-[auto_1fr_auto] md:items-center">
+            <legend id="mode-time-label" class="font-semibold md:pr-2">
+              Starting Delay
+            </legend>
+            <div class="grid grid-cols-3 gap-2">
+              <label
+                class="input input-bordered input-secondary flex items-center gap-2"
+              >
+                <span class="text-xs text-base-content/70">h</span>
+                <input
+                  required
+                  type="number"
+                  class="url-param w-full"
+                  placeholder="hh"
+                  value="0"
+                  min="0"
+                  id="h"
+                />
+              </label>
+
+              <label
+                class="input input-bordered input-secondary flex items-center gap-2"
+              >
+                <span class="text-xs text-base-content/70">m</span>
+                <input
+                  required
+                  type="number"
+                  class="url-param w-full"
+                  placeholder="mm"
+                  value="15"
+                  min="0"
+                  id="m"
+                />
+              </label>
+
+              <label
+                class="input input-bordered input-secondary flex items-center gap-2"
+              >
+                <span class="text-xs text-base-content/70">s</span>
+                <input
+                  required
+                  type="number"
+                  class="url-param w-full"
+                  placeholder="ss"
+                  value="0"
+                  min="0"
+                  id="s"
+                />
+              </label>
+            </div>
+            <p
+              id="mode-time-note"
+              class="text-sm whitespace-nowrap text-base-content/70"
+            >
+              Min: 10 min
+            </p>
+          </div>
+        </fieldset>
+
+        <div class="mt-3 grid gap-2 md:grid-cols-2">
+          <label
+            id="allow-change-control"
+            class="flex min-h-12 items-center justify-between gap-4 rounded-md bg-base-300 px-3 py-2"
+          >
+            <span id="allow-change-label" class="font-medium"
+              >Allow delay changes</span
+            >
+            <input
+              type="checkbox"
+              class="toggle toggle-secondary toggle-sm url-param"
+              id="c"
+            />
+          </label>
+
+          <label
+            class="flex min-h-12 items-center justify-between gap-4 rounded-md bg-base-300 px-3 py-2"
+          >
+            <span class="font-medium"
+              >Show delay <kbd class="kbd kbd-sm">d</kbd></span
+            >
+            <input
+              type="checkbox"
+              checked="checked"
+              class="toggle toggle-secondary toggle-sm url-param"
+              id="d"
+            />
+          </label>
+        </div>
       </div>
-
-      <div class="my-2 w-fit">
-        Starting Delay (minimum 10 min)
-
-        <label class="input ml-2 w-fit">
-          hour:<input
-            required
-            type="number"
-            class="url-param text-secondary w-9"
-            placeholder="hh"
-            value="0"
-            min="0"
-            id="h"
-          />
-
-          min:<input
-            required
-            type="number"
-            class="url-param text-secondary w-9"
-            placeholder="mm"
-            value="15"
-            min="0"
-            id="m"
-          />
-
-          sec:<input
-            required
-            type="number"
-            class="url-param text-secondary w-9"
-            placeholder="ss"
-            value="0"
-            min="0"
-            id="s"
-          />
-        </label>
-      </div>
-
-      <div class="my-2 w-fit">
-        Allow to Change Delay
-        <input
-          type="checkbox"
-          class="checkbox url-param text-secondary ml-2"
-          id="c"
-        />
-      </div>
-
-      <div class="my-2 w-fit">
-        Show Delay (top right corner, press <kbd class="kbd">d</kbd> to toggle)
-        <input
-          type="checkbox"
-          checked="checked"
-          class="checkbox url-param text-secondary ml-2"
-          id="d"
-        />
-      </div>
-
-      <button id="update-video" class="btn btn-outline btn-secondary my-2">
-        Update
-      </button>
-    </div>
+    </section>
 
     <div class="divider"></div>
 
     <div class="prose mx-auto max-w-175 px-3">
       <p>
-        This website addresses the
-        <strong>skipping issue</strong> in YouTube for delayed streams.<br /><br />
-
-        <strong>What is the skip issue?</strong> If you are currently watching a
-        stream that is 15min behind LIVE and you face some network fluctuations,
-        YouTube may jump to LIVE (i.e. 0sec delay) and those 15min will be lost.
-        But if you are using YAD and YouTube tries to jump to LIVE,
-        <b>the script will automatically bring you back</b>, so you will not
-        miss anything!<br /><br />
-
-        <strong>Note:</strong> You can't go to LIVE because the minimum delay is
-        set to 10min. If you click the <b>LIVE</b> button, the script will think
-        that YouTube skipped and will take you back.
+        Delayed YouTube keeps a YouTube player at the position you expect. Use
+        live mode for a delayed live stream, or video mode to play a normal
+        video as if it started at a local clock time.
       </p>
+
+      <h2>What problem does it solve?</h2>
+      <p>
+        YouTube playback can jump after buffering, network fluctuations, browser
+        refreshes, or player hiccups. In live mode, that can skip the delay you
+        were trying to preserve. In video mode, it can move away from the
+        position that matches the video start time. Delayed YouTube monitors the
+        player and seeks back to the expected position.
+      </p>
+
+      <h2>Common Uses</h2>
+      <ul>
+        <li>Keeping an OBS or vMix browser source safely behind LIVE.</li>
+        <li>
+          Watching a live stream with others while preserving a shared delay.
+        </li>
+        <li>
+          Monitoring a broadcast with time to react before the live moment.
+        </li>
+        <li>
+          Playing a normal video as if it started at a local time like 21:30.
+        </li>
+      </ul>
+
+      <h2>Versions</h2>
+      <ul>
+        <li>
+          <a class="link" href="https://live-miracles.github.io/delayed-yt/"
+            >Latest version</a
+          >
+          - current master build.
+        </li>
+        <li>
+          <a
+            class="link"
+            href="https://live-miracles.github.io/delayed-yt/stable/"
+            >Stable version</a
+          >
+          - build from the stable branch.
+        </li>
+      </ul>
 
       <h2>Known Issues</h2>
       <ol>
         <li>
-          Due to YouTube Player API limitations, the script only works for
+          Due to YouTube Player API limitations, the script only works for live
           streams that started at least 30min ago. For newly started streams,
           the script will not correct the skipping.
         </li>

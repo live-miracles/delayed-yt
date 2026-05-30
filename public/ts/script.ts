@@ -14,29 +14,38 @@ const START_MARGIN = 30;
 const SKIP_CORRECTION = 5;
 const STREAM_DURATION_CORRECTION = 3600;
 const DELAY_DIFF_MARGIN = 60;
+const RECORDED_DRIFT_MARGIN = 5;
+
+type VideoMode = "live" | "recorded";
 
 type PlayerState = {
   ytPlayer: YouTubePlayer | null;
   isReady: boolean;
+  mode: VideoMode;
   startingDuration: number;
   startingDate: number;
   recentStreamRetryDate: number;
   videoId: string;
   startingDelay: number;
+  recordedStartTime: number;
   savedDelay: number;
   allowDelayChange: boolean;
+  isRecordedSeekPending: boolean;
 };
 
 const player: PlayerState = {
   ytPlayer: null,
   isReady: false,
+  mode: "live",
   startingDuration: -100,
   startingDate: -100,
   recentStreamRetryDate: -100,
   videoId: "",
   startingDelay: -100,
+  recordedStartTime: -100,
   savedDelay: -100,
   allowDelayChange: false,
+  isRecordedSeekPending: false,
 };
 
 let isPlayerAPIRequested = false;
@@ -67,7 +76,9 @@ function loadPlayer(): void {
 
   playerElem.classList.remove("hidden");
   placeholderElem.classList.add("hidden");
-  playerElem.src = `${YT_BASE_URL}${player.videoId}?autoplay=1&enablejsapi=1&iv_load_policy=3`;
+  const startParam =
+    player.mode === "recorded" ? `&start=${getExpectedRecordedTime()}` : "";
+  playerElem.src = `${YT_BASE_URL}${player.videoId}?autoplay=1&enablejsapi=1&iv_load_policy=3${startParam}`;
   loadPlayerAPI();
 }
 
@@ -81,7 +92,12 @@ async function loadNewVideo(): Promise<void> {
     loadPlayer();
     return;
   }
-  await getRequiredPlayer().loadVideoById({ videoId: player.videoId });
+  await getRequiredPlayer().loadVideoById({
+    videoId: player.videoId,
+    ...(player.mode === "recorded"
+      ? { startSeconds: getExpectedRecordedTime() }
+      : {}),
+  });
 }
 
 function loadPlayerAPI(): void {
@@ -104,6 +120,23 @@ window.onYouTubeIframeAPIReady = function onYouTubeIframeAPIReady(): void {
 
 function onPlayerStateChange(event: YouTubePlayerEvent): void {
   if (event.data === YT.PlayerState.PLAYING) {
+    if (player.mode === "recorded") {
+      const currentTime = getRequiredPlayer().getCurrentTime();
+      player.startingDuration = getRequiredPlayer().getDuration();
+
+      if (player.isRecordedSeekPending) {
+        player.isRecordedSeekPending = false;
+        seekRecordedTime(getExpectedRecordedTime());
+        return;
+      }
+
+      if (!player.isReady) {
+        player.startingDate = getCurrentDate();
+      }
+      player.isReady = true;
+      return;
+    }
+
     const duration =
       getRequiredPlayer().getDuration() - STREAM_DURATION_CORRECTION;
     if (Math.abs(duration - player.startingDuration) > 10) {
@@ -119,10 +152,17 @@ function onPlayerStateChange(event: YouTubePlayerEvent): void {
 
 function updatePlayerData(): void {
   player.isReady = false;
+  const previousMode = player.mode;
   player.videoId = getVideoId();
+  player.mode = getVideoMode();
   player.startingDelay = getDelay();
-  player.allowDelayChange = getAllowDelayChange();
+  player.recordedStartTime = getRecordedStartTime();
+  player.allowDelayChange =
+    player.mode === "live" ? getAllowDelayChange() : false;
   player.savedDelay = getDelay() - SKIP_CORRECTION;
+  player.isRecordedSeekPending = player.mode === "recorded";
+  updateModeUi();
+  if (previousMode !== player.mode) renderStats(null, null);
 }
 
 function getActualDuration(playerState: PlayerState): number {
@@ -160,7 +200,19 @@ function seekDelay(delay: number): void {
   getRequiredPlayer().seekTo(newTime);
 }
 
+function seekRecordedTime(time: number): void {
+  const duration = getRequiredPlayer().getDuration();
+  const newTime = Math.max(0, duration > 0 ? Math.min(time, duration) : time);
+  console.log("Seeking to video time: " + newTime);
+  player.isReady = false;
+  getRequiredPlayer().seekTo(newTime);
+}
+
 function adjustDelay(val: number): void {
+  if (player.mode === "recorded") {
+    return;
+  }
+
   const currentDelay =
     getActualDuration(player) - getRequiredPlayer().getCurrentTime();
   let newDelay = currentDelay + val;
@@ -177,12 +229,44 @@ function getDelay(): number {
   const delayM = parseInt(getRequiredElement<HTMLInputElement>("m").value);
   const delayS = parseInt(getRequiredElement<HTMLInputElement>("s").value);
   const delay = delayH * 3600 + delayM * 60 + delayS;
+  if (getVideoMode() === "recorded") {
+    return Math.max(0, delay);
+  }
+
   console.assert(delay >= MINIMAL_DELAY);
   if (delay < MINIMAL_DELAY) {
     console.error(`Delay shouldn't be less than ${MINIMAL_DELAY}s`);
     return MINIMAL_DELAY;
   }
   return delay;
+}
+
+function getRecordedStartTime(): number {
+  const startH = parseInt(getRequiredElement<HTMLInputElement>("h").value);
+  const startM = parseInt(getRequiredElement<HTMLInputElement>("m").value);
+  const startS = parseInt(getRequiredElement<HTMLInputElement>("s").value);
+  return startH * 3600 + startM * 60 + startS;
+}
+
+function getExpectedRecordedTime(): number {
+  const now = new Date();
+  const start = new Date(now);
+  const startH = Math.floor(player.recordedStartTime / 3600);
+  const startM = Math.floor((player.recordedStartTime % 3600) / 60);
+  const startS = Math.floor(player.recordedStartTime % 60);
+  start.setHours(startH, startM, startS, 0);
+
+  if (start.getTime() > now.getTime()) {
+    start.setDate(start.getDate() - 1);
+  }
+
+  return Math.max(0, (now.getTime() - start.getTime()) / 1000);
+}
+
+function getVideoMode(): VideoMode {
+  return getRequiredElement<HTMLInputElement>("r").checked
+    ? "recorded"
+    : "live";
 }
 
 function getAllowDelayChange(): boolean {
@@ -206,6 +290,37 @@ function toggleShowDelay(): void {
   }
 }
 
+function updateModeUi(): void {
+  const isRecorded = getVideoMode() === "recorded";
+  getRequiredElement("duration-stat-title").innerHTML = isRecorded
+    ? "Duration"
+    : "Duration";
+  getRequiredElement("delay-stat-title").innerHTML = isRecorded
+    ? "Position"
+    : "Delay";
+  getRequiredElement("mode-time-label").innerHTML = isRecorded
+    ? "Video Start"
+    : "Starting Delay";
+  getRequiredElement("mode-time-note").innerHTML = isRecorded
+    ? "Local clock time"
+    : "Min: 10 min";
+  getRequiredElement("allow-change-label").innerHTML = isRecorded
+    ? "Allow position changes"
+    : "Allow delay changes";
+  const allowChangeInput = getRequiredElement<HTMLInputElement>("c");
+  const allowChangeControl = getRequiredElement("allow-change-control");
+  allowChangeInput.disabled = isRecorded;
+  if (isRecorded) allowChangeInput.checked = false;
+  allowChangeControl.classList.toggle("opacity-50", isRecorded);
+
+  document
+    .querySelectorAll<HTMLButtonElement>("[data-delay-adjust]")
+    .forEach((button) => {
+      button.disabled = isRecorded;
+      button.classList.toggle("opacity-50", isRecorded);
+    });
+}
+
 function renderStats(duration: number | null, delay: number | null): void {
   const durationElem = getRequiredElement("duration-stat");
   const delayElem = getRequiredElement("delay-stat");
@@ -222,10 +337,48 @@ function renderStats(duration: number | null, delay: number | null): void {
   delayInfo.innerHTML = durationToString(delay);
 }
 
+function tickRecordedVideo(timestamp: string): void {
+  const ytPlayer = getRequiredPlayer();
+  const currentTime = ytPlayer.getCurrentTime();
+  const duration = ytPlayer.getDuration();
+
+  if (isNaN(currentTime) || isNaN(duration)) {
+    console.error(timestamp + " | Invalid recorded player time");
+    renderStats(null, null);
+    return;
+  }
+
+  renderStats(duration, currentTime);
+
+  if (ytPlayer.getPlayerState() !== YT.PlayerState.PLAYING) {
+    return;
+  }
+
+  const expectedTime = Math.min(duration, getExpectedRecordedTime());
+  const drift = currentTime - expectedTime;
+
+  if (!player.allowDelayChange && Math.abs(drift) > RECORDED_DRIFT_MARGIN) {
+    console.log(
+      timestamp +
+        ` | Video jump detected. Current time: ${currentTime}, expected: ${expectedTime}`,
+    );
+    seekRecordedTime(expectedTime);
+    return;
+  }
+}
+
 function tick(alertElem: Element): void {
   if (!player.isReady) {
     console.log(new Date().toLocaleTimeString() + " | Player not ready");
     renderStats(null, null);
+    return;
+  }
+
+  const timestamp = new Date().toLocaleTimeString();
+
+  if (player.mode === "recorded") {
+    alertElem.classList.add("hidden");
+    tickRecordedVideo(timestamp);
     return;
   }
 
@@ -242,7 +395,6 @@ function tick(alertElem: Element): void {
 
   console.assert(player.videoId && !isNaN(player.savedDelay));
   const currentTime = getRequiredPlayer().getCurrentTime();
-  const timestamp = new Date().toLocaleTimeString();
 
   const actualDuration = getActualDuration(player);
   if (isNaN(actualDuration)) {
@@ -306,9 +458,13 @@ function tick(alertElem: Element): void {
 
 function init(): void {
   setDocumentUrlParams();
-  document
-    .querySelectorAll(".url-param")
-    .forEach((elem) => elem.addEventListener("change", updateUrlParam));
+  updateModeUi();
+  document.querySelectorAll(".url-param").forEach((elem) =>
+    elem.addEventListener("change", (event) => {
+      updateUrlParam(event);
+      updateModeUi();
+    }),
+  );
 
   loadPlayer();
 

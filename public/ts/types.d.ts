@@ -6,7 +6,11 @@ declare global {
   type YouTubePlayer = {
     getCurrentTime(): number;
     getDuration(): number;
-    loadVideoById(options: { videoId: string }): Promise<void> | void;
+    getPlayerState(): number;
+    loadVideoById(options: {
+      videoId: string;
+      startSeconds?: number;
+    }): Promise<void> | void;
     seekTo(seconds: number): void;
   };
 
@@ -23,6 +27,7 @@ declare global {
   const YT: {
     Player: YouTubePlayerConstructor;
     PlayerState: {
+      PAUSED: number;
       PLAYING: number;
     };
   };
