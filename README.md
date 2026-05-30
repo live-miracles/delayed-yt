@@ -1,6 +1,7 @@
 # Delayed YouTube
 
-<img width="700" alt="Delayed YouTube" src="https://github.com/user-attachments/assets/f929e929-07e4-4359-a7e9-a14f66fd353c">
+<img width="1139" height="431" alt="Delayed YouTube" src="https://github.com/user-attachments/assets/04fe1a6d-706a-4350-a9a6-7d959938ba4c" />
+
 
 Delayed YouTube is a small web tool for keeping a YouTube player at the
 position you expect. In live mode, it watches a live stream with a fixed delay.
