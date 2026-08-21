@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="night">
+<html lang="en" data-theme="dim">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,7 +8,7 @@
     <link rel="icon" type="image/png" href="./logo.png" />
     <script src="./js/script.js" type="module"></script>
   </head>
-  <body class="scrollbar-none min-w-[700px]">
+  <body class="scrollbar-none">
     <div
       role="alert"
       class="alert alert-warning fixed top-4 left-1/2 z-50 hidden w-fit -translate-x-1/2"
@@ -32,6 +32,7 @@
       >
     </div>
 
+    <!-- Keep the player area reserved so the final configured URL can be prepared before embedding it in vMix/OBS. -->
     <div class="width-full relative m-auto overflow-hidden pb-[56.25%]">
       <iframe
         id="player"
@@ -84,149 +85,110 @@
           </div>
           <div class="stat px-2 py-0">
             <div id="delay-stat-title" class="stat-title text-xs">Delay</div>
-            <div id="delay-stat" class="stat-value text-base text-secondary">
+            <div id="delay-stat" class="stat-value text-base text-primary">
               ...
             </div>
           </div>
         </div>
 
-        <div class="join">
+        <div id="video-mode-control" class="join" aria-label="Video mode">
           <button
-            class="btn btn-outline btn-secondary join-item btn-sm"
-            data-delay-adjust="60"
+            type="button"
+            id="live-mode-button"
+            data-video-mode="live"
+            class="btn btn-primary join-item btn-sm"
+            aria-pressed="true"
           >
-            -60s
+            Live
           </button>
+          <input type="checkbox" class="url-param sr-only" id="r" />
           <button
-            class="btn btn-outline btn-secondary join-item btn-sm"
-            data-delay-adjust="30"
+            type="button"
+            id="recorded-mode-button"
+            data-video-mode="recorded"
+            class="btn btn-outline btn-primary join-item btn-sm"
+            aria-pressed="false"
           >
-            -30s
-          </button>
-          <button
-            class="btn btn-outline btn-secondary join-item btn-sm"
-            data-delay-adjust="10"
-          >
-            -10s
-          </button>
-          <button
-            class="btn btn-secondary join-item btn-sm"
-            data-delay-adjust="-10"
-          >
-            +10s
-          </button>
-          <button
-            class="btn btn-secondary join-item btn-sm"
-            data-delay-adjust="-30"
-          >
-            +30s
-          </button>
-          <button
-            class="btn btn-secondary join-item btn-sm"
-            data-delay-adjust="-60"
-          >
-            +60s
+            Video
           </button>
         </div>
       </div>
 
       <div
-        class="rounded-lg border border-base-300 bg-base-200 px-4 py-3 text-base-content shadow-xl"
+        id="setup-form"
+        class="order-3 rounded-lg border border-base-300 bg-base-200 px-4 py-3 text-base-content shadow-xl"
       >
-        <div
-          class="grid gap-3 md:grid-cols-[auto_1fr_auto_auto] md:items-center"
-        >
-          <span class="font-semibold whitespace-nowrap">Video ID</span>
-
-          <label class="form-control w-full">
+        <div class="grid gap-3 md:grid-cols-[1fr_auto_auto] md:items-end">
+          <fieldset class="fieldset w-full">
+            <label class="label" for="v">Video ID</label>
             <input
               required
               type="text"
               placeholder="Enter video ID or paste a YouTube URL"
-              class="url-param input input-bordered input-secondary w-full"
+              class="url-param input input-bordered input-primary w-full"
               value=""
               id="v"
             />
-          </label>
+          </fieldset>
 
-          <label
-            class="flex min-h-12 items-center justify-between gap-3 rounded-md bg-base-300 px-3 py-2"
-          >
-            <span class="font-medium">Live</span>
-            <input
-              type="checkbox"
-              class="toggle toggle-secondary toggle-sm url-param"
-              id="r"
-            />
-            <span class="font-medium">Video</span>
-          </label>
+          <fieldset class="fieldset">
+            <label class="label" id="mode-time-label" for="h">
+              Starting Delay
+            </label>
+            <div class="flex items-center gap-1">
+              <input
+                required
+                type="number"
+                class="url-param input input-bordered input-primary w-16"
+                placeholder="hh"
+                value="0"
+                min="0"
+                id="h"
+                aria-label="Hours"
+              />
+              <span aria-hidden="true">:</span>
+              <input
+                required
+                type="number"
+                class="url-param input input-bordered input-primary w-16"
+                placeholder="mm"
+                value="15"
+                min="0"
+                id="m"
+                aria-label="Minutes"
+              />
+              <span aria-hidden="true">:</span>
+              <input
+                required
+                type="number"
+                class="url-param input input-bordered input-primary w-16"
+                placeholder="ss"
+                value="0"
+                min="0"
+                id="s"
+                aria-label="Seconds"
+              />
+            </div>
+          </fieldset>
 
-          <button id="update-video" class="btn btn-secondary min-w-36">
+          <button id="update-video" class="btn btn-primary min-w-36 md:mb-1">
             Update
           </button>
         </div>
+        <p
+          id="mode-time-note"
+          class="invisible text-sm text-error"
+          aria-live="polite"
+        >
+          Minimum delay is 10 minutes.
+        </p>
+      </div>
 
-        <fieldset class="mt-3">
-          <div class="grid gap-2 md:grid-cols-[auto_1fr_auto] md:items-center">
-            <legend id="mode-time-label" class="font-semibold md:pr-2">
-              Starting Delay
-            </legend>
-            <div class="grid grid-cols-3 gap-2">
-              <label
-                class="input input-bordered input-secondary flex items-center gap-2"
-              >
-                <span class="text-xs text-base-content/70">h</span>
-                <input
-                  required
-                  type="number"
-                  class="url-param w-full"
-                  placeholder="hh"
-                  value="0"
-                  min="0"
-                  id="h"
-                />
-              </label>
-
-              <label
-                class="input input-bordered input-secondary flex items-center gap-2"
-              >
-                <span class="text-xs text-base-content/70">m</span>
-                <input
-                  required
-                  type="number"
-                  class="url-param w-full"
-                  placeholder="mm"
-                  value="15"
-                  min="0"
-                  id="m"
-                />
-              </label>
-
-              <label
-                class="input input-bordered input-secondary flex items-center gap-2"
-              >
-                <span class="text-xs text-base-content/70">s</span>
-                <input
-                  required
-                  type="number"
-                  class="url-param w-full"
-                  placeholder="ss"
-                  value="0"
-                  min="0"
-                  id="s"
-                />
-              </label>
-            </div>
-            <p
-              id="mode-time-note"
-              class="text-sm whitespace-nowrap text-base-content/70"
-            >
-              Min: 10 min
-            </p>
-          </div>
-        </fieldset>
-
-        <div class="mt-3 grid gap-2 md:grid-cols-2">
+      <div
+        id="settings"
+        class="order-2 rounded-lg border border-base-300 bg-base-200 px-4 py-3 text-base-content shadow-xl"
+      >
+        <div class="grid gap-2 md:grid-cols-2">
           <label
             id="allow-change-control"
             class="flex min-h-12 items-center justify-between gap-4 rounded-md bg-base-300 px-3 py-2"
@@ -236,7 +198,7 @@
             >
             <input
               type="checkbox"
-              class="toggle toggle-secondary toggle-sm url-param"
+              class="toggle toggle-primary toggle-sm url-param"
               id="c"
             />
           </label>
@@ -244,13 +206,13 @@
           <label
             class="flex min-h-12 items-center justify-between gap-4 rounded-md bg-base-300 px-3 py-2"
           >
-            <span class="font-medium"
+            <span id="show-delay-label" class="font-medium"
               >Show delay <kbd class="kbd kbd-sm">d</kbd></span
             >
             <input
               type="checkbox"
               checked="checked"
-              class="toggle toggle-secondary toggle-sm url-param"
+              class="toggle toggle-primary toggle-sm url-param"
               id="d"
             />
           </label>
@@ -260,7 +222,7 @@
 
     <div class="divider"></div>
 
-    <div class="prose mx-auto max-w-175 px-3">
+    <div class="prose mx-auto w-[min(94vw,760px)] max-w-none px-3">
       <p>
         Delayed YouTube keeps a YouTube player at the position you expect. Use
         live mode for a delayed live stream, or video mode to play a normal
@@ -354,7 +316,7 @@
         </p>
         <p>
           Check out our
-          <a class="link" href="https://github.com/live-miracles/">homepage</a>
+          <a class="link" href="https://live-miracles.github.io/">homepage</a>
           for more streaming tools (=ↀωↀ=).
         </p>
       </aside>

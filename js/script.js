@@ -88,11 +88,11 @@ function onPlayerStateChange(event) {
     if (event.data === YT.PlayerState.PLAYING) {
         if (player.mode === "recorded") {
             const currentTime = getRequiredPlayer().getCurrentTime();
-            player.startingDuration = getRequiredPlayer().getDuration();
+            const duration = getRequiredPlayer().getDuration();
+            player.startingDuration = duration;
             if (player.isRecordedSeekPending) {
                 player.isRecordedSeekPending = false;
                 seekRecordedTime(getExpectedRecordedTime());
-                return;
             }
             if (!player.isReady) {
                 player.startingDate = getCurrentDate();
@@ -160,18 +160,7 @@ function seekRecordedTime(time) {
     const duration = getRequiredPlayer().getDuration();
     const newTime = Math.max(0, duration > 0 ? Math.min(time, duration) : time);
     console.log("Seeking to video time: " + newTime);
-    player.isReady = false;
     getRequiredPlayer().seekTo(newTime);
-}
-function adjustDelay(val) {
-    if (player.mode === "recorded") {
-        return;
-    }
-    const currentDelay = getActualDuration(player) - getRequiredPlayer().getCurrentTime();
-    let newDelay = currentDelay + val;
-    if (newDelay < MINIMAL_DELAY)
-        newDelay = MINIMAL_DELAY;
-    seekDelay(newDelay);
 }
 function getVideoId() {
     return getRequiredElement("v").value;
@@ -217,50 +206,60 @@ function getVideoMode() {
 function getAllowDelayChange() {
     return getRequiredElement("c").checked;
 }
+function updateDelayValidationUi() {
+    const delay = parseInt(getRequiredElement("h").value) * 3600 +
+        parseInt(getRequiredElement("m").value) * 60 +
+        parseInt(getRequiredElement("s").value);
+    const isInvalid = getVideoMode() === "live" && delay < MINIMAL_DELAY;
+    getRequiredElement("mode-time-note").classList.toggle("invisible", !isInvalid);
+}
 function getShowDelay() {
     return getRequiredElement("d").checked;
 }
+function updateShowDelayUi() {
+    const delayInfo = getRequiredElement("delay-info");
+    const shouldShowDelay = getShowDelay();
+    delayInfo.classList.toggle("opacity-30", shouldShowDelay);
+    delayInfo.classList.toggle("opacity-0", !shouldShowDelay);
+}
 function toggleShowDelay() {
     getRequiredElement("d").checked = !getShowDelay();
-    const delayInfo = getRequiredElement("delay-info");
-    if (getShowDelay()) {
-        delayInfo.classList.add("opacity-30");
-        delayInfo.classList.remove("opacity-0");
-    }
-    else {
-        delayInfo.classList.add("opacity-0");
-        delayInfo.classList.remove("opacity-30");
-    }
+    updateShowDelayUi();
+}
+function updateVideoModeUi() {
+    const isRecorded = getVideoMode() === "recorded";
+    const liveButton = getRequiredElement("live-mode-button");
+    const recordedButton = getRequiredElement("recorded-mode-button");
+    liveButton.classList.toggle("btn-outline", isRecorded);
+    recordedButton.classList.toggle("btn-outline", !isRecorded);
+    liveButton.setAttribute("aria-pressed", String(!isRecorded));
+    recordedButton.setAttribute("aria-pressed", String(isRecorded));
 }
 function updateModeUi() {
+    updateShowDelayUi();
+    updateVideoModeUi();
     const isRecorded = getVideoMode() === "recorded";
-    getRequiredElement("duration-stat-title").innerHTML = isRecorded
-        ? "Duration"
-        : "Duration";
+    getRequiredElement("duration-stat-title").innerHTML = "Duration";
     getRequiredElement("delay-stat-title").innerHTML = isRecorded
         ? "Position"
         : "Delay";
     getRequiredElement("mode-time-label").innerHTML = isRecorded
         ? "Video Start"
         : "Starting Delay";
-    getRequiredElement("mode-time-note").innerHTML = isRecorded
-        ? "Local clock time"
-        : "Min: 10 min";
+    updateDelayValidationUi();
     getRequiredElement("allow-change-label").innerHTML = isRecorded
         ? "Allow position changes"
         : "Allow delay changes";
+    getRequiredElement("show-delay-label").innerHTML = isRecorded
+        ? 'Show position <kbd class="kbd kbd-sm">d</kbd>'
+        : 'Show delay <kbd class="kbd kbd-sm">d</kbd>';
     const allowChangeInput = getRequiredElement("c");
     const allowChangeControl = getRequiredElement("allow-change-control");
+    player.allowDelayChange = isRecorded ? false : getAllowDelayChange();
     allowChangeInput.disabled = isRecorded;
     if (isRecorded)
         allowChangeInput.checked = false;
     allowChangeControl.classList.toggle("opacity-50", isRecorded);
-    document
-        .querySelectorAll("[data-delay-adjust]")
-        .forEach((button) => {
-        button.disabled = isRecorded;
-        button.classList.toggle("opacity-50", isRecorded);
-    });
 }
 function renderStats(duration, delay) {
     const durationElem = getRequiredElement("duration-stat");
@@ -394,11 +393,13 @@ function init() {
     getRequiredElement("update-video").addEventListener("click", () => {
         void loadNewVideo();
     });
+    const modeInput = getRequiredElement("r");
     document
-        .querySelectorAll("[data-delay-adjust]")
+        .querySelectorAll("[data-video-mode]")
         .forEach((button) => {
         button.addEventListener("click", () => {
-            adjustDelay(Number(button.dataset.delayAdjust));
+            modeInput.checked = button.dataset.videoMode === "recorded";
+            modeInput.dispatchEvent(new Event("change", { bubbles: true }));
         });
     });
     document.addEventListener("keydown", (event) => {
