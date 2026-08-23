@@ -1,3 +1,5 @@
+/// <reference path="./types.d.ts" />
+
 import {
   durationToString,
   extractYouTubeId,
@@ -13,8 +15,13 @@ const SKIP_MARGIN = 500;
 const START_MARGIN = 30;
 const SKIP_CORRECTION = 5;
 const STREAM_DURATION_CORRECTION = 3600;
+const STREAM_RETRY_INTERVAL = 60;
 const DELAY_DIFF_MARGIN = 60;
 const RECORDED_DRIFT_MARGIN = 5;
+const PLAYER_DURATION_CHANGE_MARGIN = 10;
+const SAVED_DELAY_UPDATE_MARGIN = 2;
+const CURRENT_DELAY_LOWER_BOUND = -10;
+const PLAYER_TICK_INTERVAL = 1000;
 
 type VideoMode = "live" | "recorded";
 
@@ -69,6 +76,7 @@ function loadPlayer(): void {
   if (!player.videoId) {
     playerElem.classList.add("hidden");
     placeholderElem.classList.remove("hidden");
+    placeholderElem.classList.add("flex");
     playerElem.src = "";
     renderStats(null, null);
     return;
@@ -76,6 +84,7 @@ function loadPlayer(): void {
 
   playerElem.classList.remove("hidden");
   placeholderElem.classList.add("hidden");
+  placeholderElem.classList.remove("flex");
   const startParam =
     player.mode === "recorded" ? `&start=${getExpectedRecordedTime()}` : "";
   playerElem.src = `${YT_BASE_URL}${player.videoId}?autoplay=1&enablejsapi=1&iv_load_policy=3${startParam}`;
@@ -139,7 +148,10 @@ function onPlayerStateChange(event: YouTubePlayerEvent): void {
 
     const duration =
       getRequiredPlayer().getDuration() - STREAM_DURATION_CORRECTION;
-    if (Math.abs(duration - player.startingDuration) > 10) {
+    if (
+      Math.abs(duration - player.startingDuration) >
+      PLAYER_DURATION_CHANGE_MARGIN
+    ) {
       player.startingDate = getCurrentDate();
       player.startingDuration = duration;
       player.recentStreamRetryDate = player.startingDate;
@@ -388,9 +400,9 @@ function tick(alertElem: Element): void {
     return;
   }
 
-  if (player.startingDuration === 0) {
+  if (player.startingDuration <= 0) {
     const now = getCurrentDate();
-    if (now - player.recentStreamRetryDate > 5 * 60) {
+    if (now - player.recentStreamRetryDate > STREAM_RETRY_INTERVAL) {
       player.recentStreamRetryDate = now;
       void loadNewVideo();
     }
@@ -399,7 +411,9 @@ function tick(alertElem: Element): void {
     return;
   }
 
-  console.assert(player.videoId && !isNaN(player.savedDelay));
+  alertElem.classList.add("hidden");
+
+  console.assert(!!player.videoId && !isNaN(player.savedDelay));
   const currentTime = getRequiredPlayer().getCurrentTime();
 
   const actualDuration = getActualDuration(player);
@@ -416,7 +430,10 @@ function tick(alertElem: Element): void {
   }
 
   const currentDelay = actualDuration - currentTime;
-  console.assert(currentDelay > -10, "Invalid current delay: " + currentDelay);
+  console.assert(
+    currentDelay > CURRENT_DELAY_LOWER_BOUND,
+    "Invalid current delay: " + currentDelay,
+  );
 
   renderStats(actualDuration, currentDelay);
 
@@ -441,7 +458,9 @@ function tick(alertElem: Element): void {
     );
     seekDelay(newDelay);
   } else if (currentDelay >= MINIMAL_DELAY) {
-    if (Math.abs(player.savedDelay - currentDelay) < 2) {
+    if (
+      Math.abs(player.savedDelay - currentDelay) < SAVED_DELAY_UPDATE_MARGIN
+    ) {
       return;
     }
     player.savedDelay = currentDelay;
@@ -504,7 +523,7 @@ function init(): void {
     if (event.key === "d" || event.key === "D") toggleShowDelay();
   });
 
-  setInterval(() => tick(alertElem), 1000);
+  setInterval(() => tick(alertElem), PLAYER_TICK_INTERVAL);
 }
 
 init();
