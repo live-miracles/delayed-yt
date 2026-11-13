@@ -267,6 +267,7 @@ function updateModeUi() {
     if (isRecorded)
         allowChangeInput.checked = false;
     allowChangeControl.classList.toggle("opacity-50", isRecorded);
+    getRequiredElement("allow-change-hint").classList.toggle("hidden", isRecorded);
 }
 function renderStats(duration, delay) {
     const durationElem = getRequiredElement("duration-stat");
