@@ -335,6 +335,10 @@ function updateModeUi(): void {
   allowChangeInput.disabled = isRecorded;
   if (isRecorded) allowChangeInput.checked = false;
   allowChangeControl.classList.toggle("opacity-50", isRecorded);
+  getRequiredElement("allow-change-hint").classList.toggle(
+    "hidden",
+    isRecorded,
+  );
 }
 
 function renderStats(duration: number | null, delay: number | null): void {

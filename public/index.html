@@ -126,8 +126,22 @@
       <div id="settings" class="panel order-2 px-4 py-3">
         <div class="grid gap-2 md:grid-cols-2">
           <label id="allow-change-control" class="setting-row">
-            <span id="allow-change-label">Allow delay changes</span>
-            <input type="checkbox" class="switch url-param" id="c" />
+            <span>
+              <span id="allow-change-label">Allow delay changes</span>
+              <span
+                id="allow-change-hint"
+                class="text-ink-subtle mt-0.5 block text-xs"
+              >
+                Better left off, so the delay stays fixed even if YouTube jumps.
+                To change it, edit Starting Delay and click Update.
+              </span>
+            </span>
+            <input
+              type="checkbox"
+              class="switch url-param shrink-0"
+              id="c"
+              aria-describedby="allow-change-hint"
+            />
           </label>
 
           <label class="setting-row">
