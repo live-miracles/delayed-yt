@@ -307,8 +307,6 @@ function updateVideoModeUi(): void {
     "recorded-mode-button",
   );
 
-  liveButton.classList.toggle("btn-outline", isRecorded);
-  recordedButton.classList.toggle("btn-outline", !isRecorded);
   liveButton.setAttribute("aria-pressed", String(!isRecorded));
   recordedButton.setAttribute("aria-pressed", String(isRecorded));
 }
@@ -329,8 +327,8 @@ function updateModeUi(): void {
     ? "Allow position changes"
     : "Allow delay changes";
   getRequiredElement("show-delay-label").innerHTML = isRecorded
-    ? 'Show position <kbd class="kbd kbd-sm">d</kbd>'
-    : 'Show delay <kbd class="kbd kbd-sm">d</kbd>';
+    ? 'Show position <kbd class="kbd">d</kbd>'
+    : 'Show delay <kbd class="kbd">d</kbd>';
   const allowChangeInput = getRequiredElement<HTMLInputElement>("c");
   const allowChangeControl = getRequiredElement("allow-change-control");
   player.allowDelayChange = isRecorded ? false : getAllowDelayChange();
@@ -501,8 +499,7 @@ function init(): void {
     updateUrlParam(e);
   };
 
-  const alertElem = document.querySelector(".alert");
-  if (!alertElem) throw new Error("Alert element not found");
+  const alertElem = getRequiredElement("stream-alert");
 
   getRequiredElement("delay-info").addEventListener("click", toggleShowDelay);
   getRequiredElement("update-video").addEventListener("click", () => {

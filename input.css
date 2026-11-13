@@ -1,27 +1,200 @@
 @import "tailwindcss";
-@plugin "@tailwindcss/typography";
-@plugin "daisyui" {
-  themes: dim;
+
+/*
+ * Design tokens follow the Linear design system (awesome-design-md/linear.app):
+ * near-black canvas, a four-step surface ladder with hairline borders, and a
+ * single lavender-blue accent. Depth comes from surfaces, not shadows.
+ */
+@theme {
+  --font-sans:
+    "Inter", "SF Pro Display", -apple-system, system-ui, "Segoe UI", Roboto,
+    sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --color-canvas: #010102;
+  --color-surface-1: #0f1011;
+  --color-surface-2: #141516;
+  --color-surface-3: #18191a;
+  --color-surface-4: #191a1b;
+
+  --color-hairline: #23252a;
+  --color-hairline-strong: #34343a;
+
+  --color-ink: #f7f8f8;
+  --color-ink-muted: #d0d6e0;
+  --color-ink-subtle: #8a8f98;
+  --color-ink-tertiary: #62666d;
+
+  --color-primary: #5e6ad2;
+  --color-primary-hover: #828fff;
+  --color-primary-focus: #5e69d1;
+
+  /* Semantic colors are used sparingly: validation and stream warnings only. */
+  --color-warning: #f2b84b;
+  --color-danger: #eb6f6f;
 }
 
-.card-container {
-  @apply card bg-base-200 static mx-2 my-5 inline-block min-h-44 w-[500px] shadow-xl;
+@layer base {
+  html {
+    color-scheme: dark;
+    background: var(--color-canvas);
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  html::-webkit-scrollbar {
+    display: none;
+  }
+
+  body {
+    @apply bg-canvas font-sans text-ink antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  }
 }
 
-.scrollbar-none::-webkit-scrollbar {
-  display: none;
-}
+@layer components {
+  /* ---------- Surfaces ---------- */
 
-.scrollbar-none {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+  .panel {
+    @apply border-hairline bg-surface-1 rounded-xl border;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
+  }
 
-html {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+  .rule {
+    @apply border-hairline border-0 border-t;
+  }
 
-html::-webkit-scrollbar {
-  display: none;
+  /* ---------- Buttons ---------- */
+
+  .btn {
+    @apply inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded-lg px-3.5 text-sm font-medium whitespace-nowrap transition-colors;
+    @apply focus-visible:outline-primary-focus/50 focus-visible:outline-2 focus-visible:outline-offset-2;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-white;
+    @apply hover:bg-primary-hover active:bg-primary-focus;
+  }
+
+  /* Segmented pill control (Live / Video). State comes from aria-pressed. */
+  .segmented {
+    @apply border-hairline bg-canvas inline-flex gap-0.5 rounded-full border p-0.5;
+  }
+
+  .segmented > button {
+    @apply text-ink-subtle cursor-pointer rounded-full px-3.5 py-1 text-sm font-medium transition-colors;
+    @apply hover:text-ink;
+    @apply focus-visible:outline-primary-focus/50 focus-visible:outline-2;
+  }
+
+  .segmented > button[aria-pressed="true"] {
+    @apply bg-surface-4 text-ink;
+    box-shadow: inset 0 0 0 1px var(--color-hairline-strong);
+  }
+
+  /* ---------- Form controls ---------- */
+
+  .label {
+    @apply text-ink-subtle mb-1.5 block text-xs font-medium tracking-wide;
+  }
+
+  .input {
+    @apply border-hairline-strong bg-canvas text-ink h-10 w-full rounded-lg border px-3 text-sm transition-colors;
+    @apply placeholder:text-ink-tertiary;
+    @apply hover:border-ink-tertiary;
+    @apply focus:border-primary focus:outline-primary-focus/50 focus:outline-2 focus:outline-offset-0;
+  }
+
+  .input[type="number"] {
+    @apply text-center font-mono tabular-nums;
+    appearance: textfield;
+  }
+
+  .input[type="number"]::-webkit-inner-spin-button,
+  .input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .switch {
+    @apply border-hairline-strong bg-surface-4 relative h-5 w-9 shrink-0 cursor-pointer appearance-none rounded-full border transition-colors;
+    @apply checked:border-primary checked:bg-primary;
+    @apply focus-visible:outline-primary-focus/50 focus-visible:outline-2 focus-visible:outline-offset-2;
+    @apply disabled:cursor-not-allowed;
+  }
+
+  .switch::after {
+    content: "";
+    @apply bg-ink-muted absolute top-0.5 left-0.5 size-3.5 rounded-full transition-transform;
+  }
+
+  .switch:checked::after {
+    @apply bg-white;
+    transform: translateX(0.875rem);
+  }
+
+  .setting-row {
+    @apply border-hairline bg-canvas flex min-h-12 items-center justify-between gap-4 rounded-lg border px-3.5 py-2 text-sm;
+    @apply transition-opacity;
+  }
+
+  .kbd {
+    @apply border-hairline-strong bg-surface-3 text-ink-muted ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded border px-1 font-mono text-xs;
+  }
+
+  /* ---------- Readouts ---------- */
+
+  .stat-label {
+    @apply text-ink-subtle text-xs;
+  }
+
+  .stat-value {
+    @apply text-ink font-mono text-base tabular-nums;
+  }
+
+  /* ---------- Feedback ---------- */
+
+  .toast {
+    @apply border-hairline-strong bg-surface-3 text-ink fixed top-4 flex left-1/2 z-50 w-fit max-w-[92vw] -translate-x-1/2 items-center gap-2.5 rounded-lg border px-4 py-2.5 text-sm;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.5);
+  }
+
+  /* ---------- Long-form copy ---------- */
+
+  .doc {
+    @apply text-ink-muted text-[15px] leading-relaxed;
+  }
+
+  .doc > * + * {
+    @apply mt-4;
+  }
+
+  .doc h2 {
+    @apply text-ink mt-10 text-xl font-semibold tracking-tight;
+  }
+
+  .doc ul {
+    @apply list-disc space-y-1.5 pl-5;
+  }
+
+  .doc ol {
+    @apply list-decimal space-y-3 pl-5;
+  }
+
+  .doc li > ul {
+    @apply mt-2;
+  }
+
+  .doc li::marker {
+    @apply text-ink-tertiary;
+  }
+
+  .link {
+    @apply text-primary-hover decoration-hairline-strong underline underline-offset-4 transition-colors;
+    @apply hover:decoration-primary-hover;
+  }
 }
