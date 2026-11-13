@@ -9,8 +9,7 @@ clock time, then corrects sudden jumps to another position.
 
 ## Quick start
 
-1. Open the [latest version](https://live-miracles.github.io/delayed-yt/) or
-   the [stable version](https://live-miracles.github.io/delayed-yt/stable/).
+1. Open [Delayed YouTube](https://live-miracles.github.io/delayed-yt/).
 2. Paste a YouTube video ID or YouTube URL.
 3. Select **Live** for a live stream, or **Video** for a normal video.
 4. Set the starting delay for live streams, or the video start time for video
@@ -54,13 +53,6 @@ jumps away from that expected position, Delayed YouTube seeks back. The
 adjustment buttons let you fine-tune the playback position while the page is
 running.
 
-## Versions
-
-- [Latest version](https://live-miracles.github.io/delayed-yt/) - current
-  `master` build.
-- [Stable version](https://live-miracles.github.io/delayed-yt/stable/) - build
-  from the `stable` branch.
-
 ## Limitations
 
 Live mode depends on the YouTube Player API duration reported for active
@@ -86,6 +78,4 @@ npm run format:check
 
 The website root lives in `public/`, and the TypeScript source lives in
 `public/ts/`. Every push to `master` runs GitHub Actions, executes the tests,
-builds the ignored assets, and publishes the current site to the GitHub Pages
-root. If a `stable` branch exists, the workflow also builds that branch into
-the `/stable/` folder on GitHub Pages.
+builds the ignored assets, and publishes the current site to GitHub Pages.
