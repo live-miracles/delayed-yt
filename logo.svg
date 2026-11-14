@@ -1,8 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
-  <rect width="512" height="512" rx="116" fill="#0f1011" />
-  <rect x="2" y="2" width="508" height="508" rx="114" stroke="#34343a" stroke-width="4" />
-  <g opacity=".45">
-    <path d="M146 152v208l152-104z" fill="#5e6ad2" stroke="#5e6ad2" stroke-width="28" stroke-linejoin="round" />
+  <defs>
+    <mask id="gap" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512">
+      <rect width="512" height="512" fill="#fff" />
+      <path d="M144 14v484l354-242z" fill="#000" stroke="#000" stroke-width="76" stroke-linejoin="round" />
+    </mask>
+  </defs>
+  <g opacity=".45" mask="url(#gap)">
+    <path d="M14 14v484l354-242z" fill="#5e6ad2" stroke="#5e6ad2" stroke-width="28" stroke-linejoin="round" />
   </g>
-  <path d="M218 152v208l152-104z" fill="#828fff" stroke="#828fff" stroke-width="28" stroke-linejoin="round" />
+  <path d="M144 14v484l354-242z" fill="#828fff" stroke="#828fff" stroke-width="28" stroke-linejoin="round" />
 </svg>
