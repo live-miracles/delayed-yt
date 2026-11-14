@@ -76,6 +76,10 @@ npm install
 npm run dev
 ```
 
+This serves the site at <http://localhost:3000> and rebuilds TypeScript and CSS
+on every save. There is no live reload: refresh the page manually to see
+changes.
+
 Common npm commands:
 
 ```sh
