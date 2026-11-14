@@ -55,7 +55,8 @@ function Focus-Window([IntPtr]$hwnd) {
 }
 
 # --- mouse and keyboard ------------------------------------------------------
-function Move-To([int]$x, [int]$y, [int]$ms = 600) {   # screen coordinates, eased glide
+$Glide = 600   # default cursor glide in ms; a script can lower it to move faster
+function Move-To([int]$x, [int]$y, [int]$ms = $Glide) {   # screen coordinates, eased glide
   $p = New-Object Win+POINT; [Win]::GetCursorPos([ref]$p) | Out-Null
   $steps = [Math]::Max(8, [int]($ms / 15))
   for ($i = 1; $i -le $steps; $i++) {
@@ -72,7 +73,7 @@ function Click-At([int]$x, [int]$y, [int]$wait = 900) {
   Start-Sleep -Milliseconds $wait
 }
 # Capture-region variants: take a point such as $Config.Points.AddInput.
-function CMove([int[]]$pt, [int]$ms = 600)     { Move-To ($pt[0] + $Config.Region.X) ($pt[1] + $Config.Region.Y) $ms }
+function CMove([int[]]$pt, [int]$ms = $Glide)  { Move-To ($pt[0] + $Config.Region.X) ($pt[1] + $Config.Region.Y) $ms }
 function CClick([int[]]$pt, [int]$wait = 900)  { Click-At ($pt[0] + $Config.Region.X) ($pt[1] + $Config.Region.Y) $wait }
 
 function Key-Combo([byte[]]$keys, [int]$wait = 400) {

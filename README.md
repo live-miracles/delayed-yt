@@ -10,16 +10,15 @@ viewing, and anyone who needs a reliable stream delay.
 [![License: MIT](https://img.shields.io/github/license/live-miracles/delayed-yt)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-[![Delayed YouTube in vMix. In Chrome, a YouTube live link is pasted into the Video ID field, the starting delay stays at 15 minutes, and Update loads the player. The page URL is copied and added in vMix as a Web Browser input. Clicking YouTube's LIVE button in the vMix preview jumps the readout to the live edge, and Delayed YouTube seeks back to the 15 minute delay within a second.](assets/delayed-yt-vmix-demo.gif)](assets/delayed-yt-vmix-live-jump.png)
+[![Delayed YouTube in vMix. In Chrome, a YouTube live link is pasted into the Video ID field, the starting delay stays at 15 minutes, and Update loads the player above the form. The page URL is copied and added in vMix as a Web Browser input. Clicking different spots on YouTube's timeline in the vMix preview throws the stream to other moments, and each time Delayed YouTube seeks it back to the 15 minute delay.](assets/delayed-yt-vmix-demo.gif)](assets/delayed-yt-vmix-live-jump.png)
 
 Configure the stream and delay, copy the page URL into a vMix **Web Browser**
-input, then click YouTube's LIVE button in the vMix preview. The readout drops
-to the live edge and Delayed YouTube seeks back to the configured delay.
+input, then try to break it: click anywhere on YouTube's timeline or on LIVE in
+the vMix preview. The stream jumps away, and Delayed YouTube seeks back to the
+configured delay within a second or two.
 
 <sub>The stream shown is a third-party YouTube live stream, and its content
-belongs to its channel. To make the readout legible in a GIF, the vMix input uses
-the CSS box with `#delay-info{font-size:56px !important;opacity:1 !important}`;
-that is optional.</sub>
+belongs to its channel.</sub>
 
 Delayed YouTube is a small, static web tool (no server, no account, no install)
 for keeping a YouTube player at the position you expect. In **live mode**, it

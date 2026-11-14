@@ -1,6 +1,6 @@
 ---
 name: record-demo
-description: Re-record the README demo GIF (vMix browser input, YouTube LIVE click). Use when the GIF no longer matches the site after a UI change, the stream is stale, or the user asks to redo, refresh or re-record the demo.
+description: Re-record the README demo GIF (vMix browser input, YouTube timeline clicks). Use when the GIF no longer matches the site after a UI change, the stream is stale, or the user asks to redo, refresh or re-record the demo.
 ---
 
 # Re-record the demo
@@ -20,18 +20,18 @@ Windows only: PowerShell 5.1, `ffmpeg` on PATH, vMix 64-bit, Chrome. The scripts
 Each script is `scripts/<name>.ps1`. Set `$env:DEMO_OUT` to move the working folder (default `%TEMP%\delayed-yt-demo`).
 
 1. **Prepare.** Run `prepare.ps1` (add `-CloseVMixInput` if a demo input is still in vMix).
-   Done when `shot.ps1 -Name prep` shows Chrome's empty form in view and vMix with two Blank inputs.
+   Done when `shot.ps1 -Name prep` shows Chrome with the lower part of the player above the form, and vMix with two Blank inputs.
 2. **Calibrate** only if the display, DPI, vMix version or site layout changed. Run `shot.ps1 -Name calib -Points` with each window in front.
-   Done when every red box in the screenshot sits on its target; otherwise fix `Config.Points`.
+   Done when every red box in the screenshot sits on its target; otherwise fix `Config.Points`. The vMix dialog targets need a dry run with the dialog open.
 3. **Record setup.** Run `record-setup.ps1`, then wait for the vMix input to load.
-   Done when `setup.log` has a mark through `ok` and a `shot.ps1` screenshot shows the vMix monitors with the readout at the configured delay and no ad.
+   Done when `setup.log` has a mark through `ok` and a `shot.ps1` screenshot shows the vMix monitors playing at the configured delay with no ad.
    During an ad, wait; clicking inside the preview opens the ad's link and the input navigates away. Recover by redoing step 1 with `-CloseVMixInput`.
-4. **Record the jump.** Run `record-jump.ps1`.
-   Done when frames from `sheet.ps1 -Take jump -At <times>` show the readout dropping to about `1s` and returning to the delay. Video time runs about 2 s ahead of the `jump.log` marks, so start at `click1` + 2 s and step by 0.3 s.
-5. **Build.** Run `sheet.ps1 -Take setup -Step 2`, set the cut times in `build.ps1`'s parameters from the sheet, then run `build.ps1`.
-   Done when all hold in `sheet-demo.png` and in full-size frames: the Input Select dialog's file list is blank white in every frame (no paths, no URLs), the drop and the recovery are visible, and the GIF is under 5 MB.
-   Find the first dialog frame with `sheet.ps1 -Take setup -At 21.0,21.1,21.2`: the mask starts on the first frame whose list is drawn.
-6. **Publish.** Run `build.ps1 -Publish` with the same parameters, then `cleanup.ps1`.
+4. **Record the jumps.** Run `record-jump.ps1`. It clicks several spots on YouTube's timeline.
+   Done when `sheet.ps1 -Take jump -Step 2` shows the stream landing on a different scene after most clicks and returning to the original scene about a second later. A click on the LIVE label alone can leave the picture unchanged: the stream is already within seconds of live, and the delay is restored in under a second.
+5. **Build.** Run `sheet.ps1 -Take setup -Step 2` and set the cut times in `build.ps1`'s parameters from the sheet, then run `build.ps1`. Jump cuts come from `jump.log` automatically.
+   Done when all hold in the `sheet.ps1 -At` frames and the GIF itself (`ffmpeg -i demo.gif`): the Input Select dialog's file list is white in every frame (no paths, no URLs); no white box floats over vMix after the dialog closes; each jump is visible in slow motion and the return follows it; the GIF is under 5 MB.
+   Find the exact edge frames with `sheet.ps1 -Take setup -At <times 0.07 s apart>`: the mask starts on the first frame the dialog is drawn and ends on the last frame it is on screen.
+6. **Publish.** Run `build.ps1 -Publish` (add `-StillAt <jump.mkv seconds>` for a still just after a jump), then `cleanup.ps1`.
    Done when `git status` shows only the two assets (and `README.md` if its text changed). Check the README alt text still describes the beats on screen.
 
 ## Reference
@@ -41,8 +41,9 @@ Each script is `scripts/<name>.ps1`. Set `$env:DEMO_OUT` to move the working fol
 - **Fresh Chrome profile.** `prepare.ps1` uses a throw-away profile so no account, bookmark or extension can appear on screen. Close it afterwards with `cleanup.ps1`.
 - **Dialog privacy.** vMix's Input Select dialog lists recent files and URLs, first on the Video tab and then on the Web Browser tab. `build.ps1` paints both lists white; they never appear in the GIF.
 - **Input size.** Keep vMix's default 1920×1080 for the input. Smaller sizes render letterboxed, and 640×360 left the YouTube ad frozen.
-- **Readout size.** The page's delay readout is about 4 px in vMix's monitors. `Config.Css` enlarges it through vMix's CSS box; the README says so. Set it to an empty string to record without it.
-- **LIVE pill.** It is the small "Live / -15:00" pill at the bottom-left of the preview, about 10 px wide. Hover and wait about 1 s for the controls before clicking; an earlier click toggles pause instead.
+- **Readout size.** The page's delay readout is about 4 px in vMix's monitors, so the jumps are shown through the picture changing instead. `Config.Css` can enlarge the readout through vMix's CSS box (for example `#delay-info{font-size:56px !important;opacity:1 !important}`); it is empty by default and the README does not mention it. Add a README note if you set it.
+- **Selecting the input.** Click the input's title bar (`Points.InputHeader`) to send it to Preview. Clicking its thumbnail is forwarded to the page and pauses the video.
+- **Timeline clicks.** Hover about 1 s before clicking so YouTube's controls are showing; an earlier click toggles pause instead. A timeline jump takes up to 1.7 s to come back, so `build.ps1` plays about two seconds around each click at 0.6x.
 - **Readout drift.** After each jump the delay settles a few seconds higher (`15m 1s`, `15m 6s`, `15m 12s`); this is the script's own correction.
 - **Third-party content.** The recording shows the chosen stream's artwork. Keep the README note that its content belongs to its channel.
-- **Size budget.** Keep the GIF under 5 MB at 960 px wide; GitHub renders larger ones slowly. Cut idle waits and speed up the loading in `build.ps1` first.
+- **Size budget.** Keep the GIF under 5 MB; GitHub renders larger ones slowly. `build.ps1` defaults to 10 fps, 800 px, 96 colours (4.6 MB for 42 s). Cut idle waits, drop a jump or speed up the loading before lowering quality further.
