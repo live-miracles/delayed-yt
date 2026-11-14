@@ -36,7 +36,6 @@ jumps to another position.
 - Accepts a video ID or any YouTube URL.
 - All settings live in the page URL, so one copied link is a complete
   configuration for a vMix or OBS browser source.
-- Fine-tune buttons to nudge the playback position while it runs.
 - Runs entirely in the browser and is hosted on GitHub Pages.
 
 ## Quick start
@@ -84,9 +83,7 @@ delay.
 In video mode, the page tracks where the video should be based on the local
 time when the video began. If the current time is 21:45 and the video start is
 set to 21:30, the expected video position is 15 minutes. If the player suddenly
-jumps away from that expected position, Delayed YouTube seeks back. The
-adjustment buttons let you fine-tune the playback position while the page is
-running.
+jumps away from that expected position, Delayed YouTube seeks back.
 
 ## Limitations
 
