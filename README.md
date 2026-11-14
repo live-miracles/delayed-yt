@@ -1,5 +1,15 @@
 # Delayed YouTube
 
+**Watch a YouTube live stream a fixed time behind LIVE, and stay there.** If
+YouTube skips ahead after buffering or a refresh, Delayed YouTube seeks back to
+your delay automatically. Built for vMix and OBS browser sources, shared
+viewing, and anyone who needs a reliable stream delay.
+
+[![Live demo](https://img.shields.io/badge/live%20demo-open%20the%20app-red?logo=youtube&logoColor=white)](https://live-miracles.github.io/delayed-yt/)
+[![Deploy](https://github.com/live-miracles/delayed-yt/actions/workflows/deploy.yml/badge.svg)](https://github.com/live-miracles/delayed-yt/actions/workflows/deploy.yml)
+[![License: MIT](https://img.shields.io/github/license/live-miracles/delayed-yt)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+
 [![Delayed YouTube in vMix. In Chrome, a YouTube live link is pasted into the Video ID field, the starting delay stays at 15 minutes, and Update loads the player. The page URL is copied and added in vMix as a Web Browser input. Clicking YouTube's LIVE button in the vMix preview jumps the readout to the live edge, and Delayed YouTube seeks back to the 15 minute delay within a second.](assets/delayed-yt-vmix-demo.gif)](assets/delayed-yt-vmix-live-jump.png)
 
 Configure the stream and delay, copy the page URL into a vMix **Web Browser**
@@ -11,10 +21,23 @@ belongs to its channel. To make the readout legible in a GIF, the vMix input use
 the CSS box with `#delay-info{font-size:56px !important;opacity:1 !important}`;
 that is optional.</sub>
 
-Delayed YouTube is a small web tool for keeping a YouTube player at the
-position you expect. In live mode, it watches a live stream with a fixed delay.
-In video mode, it treats a normal YouTube video as if it started at a local
-clock time, then corrects sudden jumps to another position.
+Delayed YouTube is a small, static web tool (no server, no account, no install)
+for keeping a YouTube player at the position you expect. In **live mode**, it
+watches a live stream with a fixed delay. In **video mode**, it treats a normal
+YouTube video as if it started at a local clock time, then corrects sudden
+jumps to another position.
+
+## Features
+
+- Fixed delay behind LIVE for any YouTube live stream, with automatic recovery
+  when YouTube jumps to the live edge.
+- Video mode that plays a normal video as if it started at a chosen local
+  clock time.
+- Accepts a video ID or any YouTube URL.
+- All settings live in the page URL, so one copied link is a complete
+  configuration for a vMix or OBS browser source.
+- Fine-tune buttons to nudge the playback position while it runs.
+- Runs entirely in the browser and is hosted on GitHub Pages.
 
 ## Quick start
 
@@ -41,6 +64,9 @@ video mode, that means returning to the expected position based on the local
 clock time when the video started.
 
 ## Common uses
+
+> Works in vMix (Web Browser input), OBS (Browser Source), and any regular
+> browser.
 
 - Keeping an OBS or vMix browser source safely behind LIVE.
 - Watching a live stream with others while preserving a shared delay.
@@ -76,8 +102,8 @@ npm install
 npm run dev
 ```
 
-This serves the site at <http://localhost:3000> and rebuilds TypeScript and CSS
-on every save. There is no live reload: refresh the page manually to see
+This serves the site at <http://localhost:3000> and rebuilds TypeScript and
+[Tailwind CSS](https://tailwindcss.com/) on every save. There is no live reload: refresh the page manually to see
 changes.
 
 Common npm commands:
@@ -92,3 +118,7 @@ npm run format:check
 The website root lives in `public/`, and the TypeScript source lives in
 `public/ts/`. Every push to `master` runs GitHub Actions, executes the tests,
 builds the ignored assets, and publishes the current site to GitHub Pages.
+
+## License
+
+[MIT](LICENSE)
